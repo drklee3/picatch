@@ -1,0 +1,15 @@
+[package]
+name = "dphoto"
+version = "0.1.0"
+authors = ["drklee3 <derrick@dlee.dev>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-web = "2.0.0-alpha.4"
+actix-rt = "1.0.0"
+actix-files = "0.2.0-alpha.3"
+env_logger = "0.7.1"
+futures = "0.3.1"
+
