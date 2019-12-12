@@ -1,3 +1,4 @@
+use crate::error::Result;
 use crate::resizer::{resize, ResizeOptions};
 use actix_web::{get, web, HttpResponse, Responder};
 use std::collections::HashMap;
@@ -11,17 +12,17 @@ pub async fn album(info: web::Path<(String, String)>) -> impl Responder {
 pub async fn image(
     query: web::Query<HashMap<String, u32>>,
     file: web::Path<(String)>,
-) -> HttpResponse {
+) -> Result<HttpResponse> {
     println!("query: {:#?}", &query);
     let opts = ResizeOptions {
-        width: *query.get("width").unwrap_or(&400),
-        height: *query.get("height").unwrap_or(&400),
+        width: query.get("width").cloned(),
+        height: query.get("height").cloned(),
         mode: *query.get("mode").unwrap_or(&0),
     };
 
     let file_path = format!("static/{}", file.into_inner());
 
-    let img_buf = resize(&file_path, opts);
+    let img_buf = resize(&file_path, opts)?;
 
-    HttpResponse::Ok().body(img_buf)
+    Ok(HttpResponse::Ok().body(img_buf))
 }

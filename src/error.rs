@@ -1,3 +1,4 @@
+use actix_web::{HttpResponse, ResponseError};
 use image::ImageError;
 use std::error::Error as StdError;
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -42,6 +43,15 @@ impl StdError for Error {
         match *self {
             Error::Image(ref inner) => inner.description(),
             Error::Io(ref inner) => inner.description(),
+        }
+    }
+}
+
+impl ResponseError for Error {
+    fn error_response(&self) -> HttpResponse {
+        match self {
+            Error::Image(_) => HttpResponse::BadRequest().finish(),
+            Error::Io(_) => HttpResponse::InternalServerError().finish(),
         }
     }
 }
