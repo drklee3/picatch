@@ -1,10 +1,11 @@
 use actix_files as fs;
+use std::collections::HashMap;
 use actix_web::{
     get, middleware, web, web::Bytes, App, HttpResponse, HttpServer, Responder, Result,
 };
 
 mod resizer;
-use resizer::{resize, FitMode, ResizeOptions};
+use resizer::{resize, ResizeOptions};
 
 #[get("/album/{album}/{photo}")]
 async fn api(info: web::Path<(String, String)>) -> impl Responder {
@@ -12,11 +13,12 @@ async fn api(info: web::Path<(String, String)>) -> impl Responder {
 }
 
 #[get("/image/{photo}")]
-async fn image(file: web::Path<(String)>) -> HttpResponse {
+async fn image(query: web::Query<HashMap<String, u32>>, file: web::Path<(String)>) -> HttpResponse {
+    println!("query: {:#?}", &query);
     let opts = ResizeOptions {
-        width: 400,
-        height: 400,
-        mode: FitMode::Scale,
+        width: *query.get("width").unwrap_or(&400),
+        height: *query.get("height").unwrap_or(&400),
+        mode: *query.get("mode").unwrap_or(&0),
     };
 
     let file_path = format!("static/{}", file.into_inner());
