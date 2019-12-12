@@ -1,8 +1,6 @@
 use actix_files as fs;
+use actix_web::{get, middleware, web, App, HttpResponse, HttpServer, Responder};
 use std::collections::HashMap;
-use actix_web::{
-    get, middleware, web, web::Bytes, App, HttpResponse, HttpServer, Responder, Result,
-};
 
 mod resizer;
 use resizer::{resize, ResizeOptions};
