@@ -50,7 +50,7 @@ impl StdError for Error {
 impl ResponseError for Error {
     fn error_response(&self) -> HttpResponse {
         match self {
-            Error::Image(_) => HttpResponse::BadRequest().finish(),
+            Error::Image(_) => HttpResponse::NotFound().finish(),
             Error::Io(_) => HttpResponse::InternalServerError().finish(),
         }
     }
