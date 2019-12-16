@@ -2,12 +2,12 @@ use actix_web::{HttpResponse, ResponseError};
 use argonautica::Error as ArgonauticaError;
 use image::ImageError;
 use std::error::Error as StdError;
+use std::fmt::Error as FmtError;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::io::Error as IoError;
 use std::result::Result as StdResult;
 use toml::de::Error as TomlDeError;
 use toml::ser::Error as TomlSeError;
-use std::fmt::Error as FmtError;
 
 /// Common result type
 pub type Result<T> = StdResult<T, Error>;
@@ -26,8 +26,7 @@ pub enum Error {
     /// A `toml` crate deserialize error
     TomlDe(TomlDeError),
     /// A `toml` crate serialize error
-    TomlSe(TomlSeError)
-    
+    TomlSe(TomlSeError),
 }
 
 impl From<ArgonauticaError> for Error {
@@ -87,7 +86,7 @@ impl StdError for Error {
             Error::Io(ref inner) => inner.description(),
             Error::TomlDe(ref inner) => inner.description(),
             Error::TomlSe(ref inner) => inner.description(),
-            _ => "uhh"
+            _ => "uhh",
         }
     }
 }

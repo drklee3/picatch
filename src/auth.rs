@@ -1,7 +1,8 @@
+/// These are blocking functions, be sure to use web::block when using them
 use crate::error::Result;
 use argonautica::{Hasher, Verifier};
-use rand::Rng;
 use rand::distributions::Alphanumeric;
+use rand::Rng;
 use std::fs;
 use std::io::Write;
 
@@ -46,6 +47,7 @@ pub fn verify(hash: &str, password: &str) -> Result<bool> {
         .with_hash(hash)
         .with_password(password)
         .with_secret_key(SECRET_KEY.as_str())
+        // use verify_non_blocking?
         .verify()
         .map_err(Into::into)
 }

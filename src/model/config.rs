@@ -19,4 +19,3 @@ impl FromStr for DbConfig {
         toml::from_str(str_cfg).map_err(Into::into)
     }
 }
-

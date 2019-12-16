@@ -8,21 +8,19 @@ use std::collections::HashMap;
 
 #[get("/")]
 async fn index(id: Identity) -> String {
-    let config = setup::get_config();
-
     format!(
         "Hello {}",
         id.identity().unwrap_or_else(|| "Anonymous".to_owned())
     )
 }
 
-#[get("/login")]
+#[post("/login")]
 async fn login(id: Identity) -> HttpResponse {
     id.remember("user1".to_owned());
     HttpResponse::Found().header("location", "/").finish()
 }
 
-#[get("/logout")]
+#[post("/logout")]
 async fn logout(id: Identity) -> HttpResponse {
     id.forget();
     HttpResponse::Found().header("location", "/").finish()
