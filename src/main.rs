@@ -30,15 +30,15 @@ async fn main() -> Result<()> {
             )
             // AUTH routes
             // POST /login
-            .service(api::login)
+            .service(api::post_login)
             // POST /logout
-            .service(api::logout)
-            .service(api::index)
+            .service(api::post_logout)
+            .service(api::get_index)
             // API endpoints
             // GET /album/{album}
-            .service(api::album)
+            .service(api::get_album)
             // GET /image/{image}
-            .service(api::image)
+            .service(api::get_image)
     })
     .bind("127.0.0.1:8080")?
     .start()

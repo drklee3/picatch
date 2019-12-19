@@ -1,4 +1,4 @@
-use super::{Role, Permission};
+use super::{Permission, Role};
 use crate::schema::role_permissions;
 use serde_derive::{Deserialize, Serialize};
 
