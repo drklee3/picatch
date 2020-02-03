@@ -3,7 +3,6 @@ use crate::schema::sessions;
 use base64;
 use chrono;
 use ipnetwork::IpNetwork;
-use rand;
 use rand_chacha::rand_core::{RngCore, SeedableRng};
 use rand_chacha::ChaCha12Rng;
 use serde_derive::{Deserialize, Serialize};
@@ -36,7 +35,6 @@ impl Session {
 }
 
 fn generate_session_id() -> String {
-    let seed = [0u8; 32];
     let mut rng = ChaCha12Rng::from_entropy();
 
     let mut buf = [0; 32];

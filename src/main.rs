@@ -1,7 +1,7 @@
 use actix_files as fs;
 use actix_http::cookie::SameSite;
 use actix_identity::{CookieIdentityPolicy, IdentityService};
-use actix_web::{middleware, App, HttpServer};
+use actix_web::{web, middleware, App, HttpServer};
 use dotenv;
 
 use dphoto_lib::*;
@@ -17,6 +17,7 @@ async fn main() -> Result<()> {
     HttpServer::new(|| {
         App::new()
             .wrap(IdentityService::new(
+                // TODO: Update secret key with an actual secret key
                 CookieIdentityPolicy::new(&[0; 32])
                     .name("dphoto-auth")
                     .secure(false)
@@ -28,17 +29,20 @@ async fn main() -> Result<()> {
                 // static files
                 fs::Files::new("/static", "./static/").show_files_listing(),
             )
-            // AUTH routes
-            // POST /login
-            .service(api::post_login)
-            // POST /logout
-            .service(api::post_logout)
-            .service(api::get_index)
-            // API endpoints
-            // GET /album/{album}
-            .service(api::get_album)
-            // GET /image/{image}
-            .service(api::get_image)
+            .service(
+                web::scope("/api")
+                    // AUTH routes
+                    // POST /login
+                    .service(api::post_login)
+                    // POST /logout
+                    .service(api::post_logout)
+                    .service(api::get_index)
+                    // API endpoints
+                    // GET /album/{album}
+                    .service(api::get_album)
+                    // GET /image/{image}
+                    .service(api::get_image)
+            )
     })
     .bind("127.0.0.1:8080")?
     .start()
