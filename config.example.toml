@@ -1,0 +1,5 @@
+[database]
+username = "postgres"
+password = "database pasword"
+host = "localhost"
+name = "database name"
