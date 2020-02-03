@@ -1,5 +1,5 @@
-use dphoto_lib::model::store::Session;
 use chrono::Utc;
+use dphoto_lib::model::store::Session;
 use std::net::{IpAddr, Ipv4Addr};
 
 #[test]

@@ -1,5 +1,5 @@
 use actix_identity::Identity;
-use actix_web::{get};
+use actix_web::get;
 
 #[get("/")]
 pub async fn get_index(id: Identity) -> String {
