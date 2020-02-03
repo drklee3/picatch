@@ -21,6 +21,7 @@ async fn main() -> Result<()> {
     let config = get_config()?;
     let db_url = config.to_url();
 
+    // Connect to database and create connection pool with r2d2
     let manager = ConnectionManager::<PgConnection>::new(db_url);
     let pool = r2d2::Pool::builder()
         .build(manager)
@@ -39,8 +40,10 @@ async fn main() -> Result<()> {
             // enable logger - register logger last!
             .wrap(middleware::Logger::default())
             .service(
-                // static files
-                fs::Files::new("/static", "./static/").show_files_listing(),
+                // Serve static files
+                fs::Files::new("/", "./static/")
+                    .show_files_listing()
+                    .index_file("index.html"),
             )
             .service(
                 web::scope("/api")
@@ -58,7 +61,7 @@ async fn main() -> Result<()> {
             )
     })
     .bind("127.0.0.1:8080")?
-    .start()
+    .run()
     .await
     .map_err(Into::into)
 }
