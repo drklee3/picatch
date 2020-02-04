@@ -1,6 +1,7 @@
 use actix_web::{error::BlockingError, HttpResponse, ResponseError};
 use argonautica::Error as ArgonauticaError;
 use diesel::result::{DatabaseErrorKind, Error as DieselError};
+use diesel_migrations::RunMigrationsError;
 use image::ImageError;
 use std::error::Error as StdError;
 use std::fmt::Error as FmtError;
@@ -16,17 +17,19 @@ pub type Result<T> = StdResult<T, Error>;
 /// Common error type to hold errors from other crates
 #[derive(Debug)]
 pub enum Error {
-    /// A `argonautica` crate error
+    /// `argonautica` error
     Argonautica(ArgonauticaError),
-    /// a `std::fmt` error
+    /// `std::fmt` error
     Fmt(FmtError),
-    /// A `image` crate error
+    /// `image` error
     Image(ImageError),
-    /// A `std::io` crate error
+    /// `std::io` error
     Io(IoError),
-    /// A `toml` crate deserialize error
+    /// `diesel_migrations` error
+    Migrations(RunMigrationsError),
+    /// `toml` deserialize error
     TomlDe(TomlDeError),
-    /// A `toml` crate serialize error
+    /// `toml` serialize error
     TomlSe(TomlSeError),
     /// Custom errors to give http responses
     Unauthorized,
@@ -55,6 +58,12 @@ impl From<ImageError> for Error {
 impl From<IoError> for Error {
     fn from(err: IoError) -> Error {
         Error::Io(err)
+    }
+}
+
+impl From<RunMigrationsError> for Error {
+    fn from(err: RunMigrationsError) -> Error {
+        Error::Migrations(err)
     }
 }
 
@@ -105,6 +114,7 @@ impl Display for Error {
             Error::Argonautica(ref inner) => inner.fmt(f),
             Error::Fmt(ref inner) => inner.fmt(f),
             Error::Image(ref inner) => inner.fmt(f),
+            Error::Migrations(ref inner) => inner.fmt(f),
             Error::Io(ref inner) => inner.fmt(f),
             Error::TomlDe(ref inner) => inner.fmt(f),
             Error::TomlSe(ref inner) => inner.fmt(f),
@@ -120,6 +130,7 @@ impl StdError for Error {
         match *self {
             Error::Fmt(ref inner) => inner.description(),
             Error::Image(ref inner) => inner.description(),
+            Error::Migrations(ref inner) => inner.description(),
             Error::Io(ref inner) => inner.description(),
             Error::TomlDe(ref inner) => inner.description(),
             Error::TomlSe(ref inner) => inner.description(),

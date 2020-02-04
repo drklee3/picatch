@@ -1,12 +1,16 @@
 #[macro_use]
 extern crate log;
 
+#[macro_use]
+extern crate diesel_migrations;
+
 use actix_files as fs;
 use actix_http::cookie::SameSite;
 use actix_identity::{CookieIdentityPolicy, IdentityService};
 use actix_web::{middleware, web, App, HttpServer};
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
+use diesel_migrations::run_pending_migrations;
 use dotenv;
 use setup::get_config;
 
@@ -14,6 +18,9 @@ use dphoto_lib::*;
 use model::pool::Pool;
 
 use error::Result;
+
+// Embed SQL migrations into compiled binary
+embed_migrations!("migrations");
 
 #[actix_rt::main]
 async fn main() -> Result<()> {
@@ -33,7 +40,15 @@ async fn main() -> Result<()> {
         .max_size(5)
         .build(manager)
         .expect("Failed to create pool :'(");
+
     debug!("Connected to database");
+
+    {
+        // New scope so this connection gets dropped after migrations
+        let conn = &pool.get().unwrap();
+        run_pending_migrations(conn)?;
+        debug!("Pending migrations finished");
+    }
 
     HttpServer::new(move || {
         App::new()
