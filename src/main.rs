@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate log;
+
 use actix_files as fs;
 use actix_http::cookie::SameSite;
 use actix_identity::{CookieIdentityPolicy, IdentityService};
@@ -14,18 +17,20 @@ use error::Result;
 #[actix_rt::main]
 async fn main() -> Result<()> {
     dotenv::dotenv().ok();
-    std::env::set_var("RUST_LOG", "actix_web=info");
+    std::env::set_var("RUST_LOG", "debug");
     env_logger::init();
 
     // Exit if no config found
     let config = get_config()?;
-    let db_url = config.to_url();
+    let db_url = config.to_url().expect("Invalid database url");
 
     // Connect to database and create connection pool with r2d2
     let manager = ConnectionManager::<PgConnection>::new(db_url);
     let pool = r2d2::Pool::builder()
+        .max_size(5)
         .build(manager)
         .expect("Failed to create pool :'(");
+    debug!("Connected to database");
 
     HttpServer::new(move || {
         App::new()

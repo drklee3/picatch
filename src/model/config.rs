@@ -10,20 +10,51 @@ pub struct Config {
 
 #[derive(Deserialize, Serialize)]
 pub struct DbConfig {
-    pub username: String,
-    pub password: String,
-    pub host: String,
-    pub name: String,
+    pub url: Option<String>,
+    pub username: Option<String>,
+    pub password: Option<String>,
+    pub host: Option<String>,
+    pub port: Option<String>,
+    pub name: Option<String>,
     pub table_prefix: Option<String>,
 }
 
 impl Config {
-    pub fn to_url(&self) -> String {
+    /// Check either if a database url or equivalent fields exist
+    pub fn is_valid(&self) -> bool {
         let db = &self.database;
-        format!(
-            "postgresql://{}:{}@{}/{}",
-            db.username, db.password, db.host, db.name
-        )
+        if db.url.is_some() {
+            return true;
+        }
+
+        [&db.username, &db.password, &db.host, &db.name]
+            .iter()
+            .all(|x| x.is_some())
+    }
+
+    /// Converts config to a database url.  If a database url is provided in the
+    /// config, it will have priority.
+    pub fn to_url(&self) -> Option<String> {
+        let db = &self.database;
+
+        if !self.is_valid() {
+            return None;
+        }
+
+        if db.url.is_some() {
+            return db.url.clone();
+        }
+
+        // Okay to unwrap here since is_valid() verifies they are all Some<String>
+        Some(format!(
+            "postgresql://{}:{}@{}:{}/{}",
+            db.username.as_ref().unwrap(),
+            db.password.as_ref().unwrap(),
+            db.host.as_ref().unwrap(),
+            // This isn't checked in is_valid() since we can just use the default port
+            db.port.as_ref().unwrap_or(&"5432".to_owned()),
+            db.name.as_ref().unwrap()
+        ))
     }
 }
 
