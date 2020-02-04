@@ -87,6 +87,9 @@ impl From<DieselError> for Error {
     }
 }
 
+// Actix web::block response, we can just use ? to handle blocking calls now
+// like so:  web::block(...).await?
+// Instead of having to do a match for every blocking call
 impl From<BlockingError<Error>> for Error {
     fn from(error: BlockingError<Error>) -> Error {
         match error {
