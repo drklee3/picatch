@@ -1,5 +1,6 @@
-use actix_web::{HttpResponse, ResponseError};
+use actix_web::{error::BlockingError, HttpResponse, ResponseError};
 use argonautica::Error as ArgonauticaError;
+use diesel::result::{DatabaseErrorKind, Error as DieselError};
 use image::ImageError;
 use std::error::Error as StdError;
 use std::fmt::Error as FmtError;
@@ -27,6 +28,10 @@ pub enum Error {
     TomlDe(TomlDeError),
     /// A `toml` crate serialize error
     TomlSe(TomlSeError),
+    /// Custom errors to give http responses
+    Unauthorized,
+    BadRequest(String),
+    InternalServerError,
 }
 
 impl From<ArgonauticaError> for Error {
@@ -65,6 +70,32 @@ impl From<TomlSeError> for Error {
     }
 }
 
+impl From<DieselError> for Error {
+    fn from(error: DieselError) -> Error {
+        // Right now we just care about UniqueViolation from diesel
+        // But this would be helpful to easily map errors as our app grows
+        match error {
+            DieselError::DatabaseError(kind, info) => {
+                if let DatabaseErrorKind::UniqueViolation = kind {
+                    let message = info.details().unwrap_or_else(|| info.message()).to_string();
+                    return Error::BadRequest(message);
+                }
+                Error::InternalServerError
+            }
+            _ => Error::InternalServerError,
+        }
+    }
+}
+
+impl From<BlockingError<Error>> for Error {
+    fn from(error: BlockingError<Error>) -> Error {
+        match error {
+            BlockingError::Error(err) => err,
+            BlockingError::Canceled => Error::InternalServerError,
+        }
+    }
+}
+
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         match *self {
@@ -74,6 +105,9 @@ impl Display for Error {
             Error::Io(ref inner) => inner.fmt(f),
             Error::TomlDe(ref inner) => inner.fmt(f),
             Error::TomlSe(ref inner) => inner.fmt(f),
+            Error::InternalServerError => write!(f, "Internal Server Error"),
+            Error::BadRequest(ref inner) => write!(f, "BadRequest: {}", inner),
+            Error::Unauthorized => write!(f, "Unauthorized"),
         }
     }
 }
@@ -86,6 +120,9 @@ impl StdError for Error {
             Error::Io(ref inner) => inner.description(),
             Error::TomlDe(ref inner) => inner.description(),
             Error::TomlSe(ref inner) => inner.description(),
+            Error::BadRequest(ref inner) => inner,
+            Error::InternalServerError => "Internal Server Error",
+            Error::Unauthorized => "Unauthorized",
             _ => "uhh",
         }
     }
@@ -96,6 +133,11 @@ impl ResponseError for Error {
         match self {
             Error::Image(_) => HttpResponse::NotFound().finish(),
             Error::Io(_) => HttpResponse::InternalServerError().finish(),
+            Error::InternalServerError => {
+                HttpResponse::InternalServerError().json("Internal Server Error, Please try later")
+            }
+            Error::BadRequest(ref message) => HttpResponse::BadRequest().json(message),
+            Error::Unauthorized => HttpResponse::Unauthorized().json("Unauthorized"),
             _ => HttpResponse::InternalServerError().finish(),
         }
     }

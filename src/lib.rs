@@ -9,3 +9,4 @@ pub mod model;
 pub mod resizer;
 pub mod schema;
 pub mod setup;
+pub mod utils;

@@ -23,8 +23,8 @@ table! {
     sessions (id) {
         id -> Text,
         user_id -> Int4,
-        ip_address -> Inet,
-        user_agent -> Text,
+        ip_address -> Nullable<Inet>,
+        user_agent -> Nullable<Text>,
         last_activity -> Timestamp,
     }
 }
