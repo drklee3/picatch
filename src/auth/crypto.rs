@@ -1,5 +1,6 @@
 /// These are blocking functions, be sure to use web::block when using them
 use crate::error::Result;
+use crate::model::config::Config;
 use argonautica::{Hasher, Verifier};
 use rand::distributions::Alphanumeric;
 use rand::Rng;
@@ -7,30 +8,32 @@ use std::fs;
 use std::io::Write;
 
 lazy_static::lazy_static! {
-    static ref SECRET_KEY: String = get_secret_key().expect("Failed to generate secret key");
+    static ref SECRET_KEY: String = get_secret_key().expect("Failed to get secret key");
 }
 
 fn get_secret_key() -> Result<String> {
-    if let Ok(key) = std::env::var("SECRET_KEY") {
-        return Ok(key);
+    // Abort on read config errors -- if we can't read config for db info then
+    // we don't exactly need this either
+    let mut config = Config::get_from_file()?;
+
+    // If it exists, we don't need to do anything further, just return it
+    if let Some(secret_key) = config.secret_key {
+        return Ok(secret_key);
     }
 
-    // create a random one and save it to .env
-    let rand_key = rand::thread_rng()
+    // No secret key so create a random one and save it to config
+    let secret_key = rand::thread_rng()
         .sample_iter(&Alphanumeric)
         .take(32)
         .collect::<String>();
 
-    // should make sure there isn't already a SECRET_KEY here though, maybe
-    // dotenv fails to load it somehow (eg in tests)
-    let mut file = fs::OpenOptions::new()
-        .write(true)
-        .append(true)
-        .open(".env")?;
+    config.secret_key = Some(secret_key.clone());
 
-    writeln!(file, "SECRET_KEY={}", rand_key)?;
+    // If this fails, we better abort too, if we fail to save secret key then
+    // encrypted content would be lost
+    config.save_to_file()?;
 
-    Ok(rand_key)
+    Ok(secret_key)
 }
 
 pub fn hash_password(password: &str) -> Result<String> {

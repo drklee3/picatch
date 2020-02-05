@@ -12,9 +12,9 @@ use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
 use diesel_migrations::run_pending_migrations;
 use dotenv;
-use setup::get_config;
 
 use dphoto_lib::*;
+use model::config::Config;
 use model::pool::Pool;
 
 use error::Result;
@@ -29,7 +29,7 @@ async fn main() -> Result<()> {
     env_logger::init();
 
     // Exit if no config found
-    let config = get_config()?;
+    let config = Config::get_from_file()?;
     let db_url = config.to_url().expect("Invalid database url");
 
     // Connect to database and create connection pool with r2d2

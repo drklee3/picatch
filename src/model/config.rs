@@ -1,11 +1,13 @@
 use crate::error::{Error, Result};
 use serde_derive::{Deserialize, Serialize};
+use std::fs;
 use std::str::FromStr;
 use toml;
 
 #[derive(Deserialize, Serialize)]
 pub struct Config {
     pub database: DbConfig,
+    pub secret_key: Option<String>,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -20,6 +22,19 @@ pub struct DbConfig {
 }
 
 impl Config {
+    pub fn get_from_file() -> Result<Self> {
+        fs::read_to_string("config.toml").map_err(|e| {
+            error!("Failed to read config.toml from file");
+
+            e
+        })?.parse()
+    }
+
+    pub fn save_to_file(&self) -> Result<()> {
+        let str_config = toml::to_string_pretty(&self)?;
+        fs::write("config.toml", &str_config).map_err(Into::into)
+    }
+
     /// Check either if a database url or equivalent fields exist
     pub fn is_valid(&self) -> bool {
         let db = &self.database;
