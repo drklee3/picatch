@@ -70,17 +70,23 @@ cargo run --release
 
 ## TODO / Features
 
-* [ ] Auth system
-  * [ ] User accounts
-  * [ ] Roles (should i bother idk)
-  * [ ] Role Permission
+* [ ] Authentication
+  * [ ] Registration
+  * [ ] Login
   * [ ] Session management
-* [ ] Image Handling
+  * [ ] Roles (should i bother idk)
+  * [ ] Role Permissions
+* [ ] Images
   * [ ] Resizing
   * [ ] Caching
-* [ ] Uh everything front end
-  * [ ] Login
-  * [ ] Home page
+* [ ] Albums
+  * [ ] Permissions
+  * [ ] Visibility
+  * [ ] Password
+  * [ ] Multiple albums per image
+* [ ] Uh front end
+  * [ ] Login / Register
+  * [ ] Home
   * [ ] Albums
   * [ ] Images
   * [ ] Settings
