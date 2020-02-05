@@ -6,6 +6,7 @@ uhh wip + need a new name 🤔
 
 * Rust version 1.39+ (for async/await)
 * PostgreSQL
+* `libpq-dev`
 
 ## Building
 
@@ -65,7 +66,7 @@ cargo run --release
 
 ## client
 
-* todo but probably React
+* todo but probably React.. and maybe Gatsby?
 
 ## TODO / Features
 
