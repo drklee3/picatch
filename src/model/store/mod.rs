@@ -10,5 +10,5 @@ pub use permission::Permission;
 pub use role::Role;
 pub use role_permission::RolePermission;
 pub use session::Session;
-pub use user::User;
+pub use user::{User, NewUser};
 pub use user_role::UserRole;

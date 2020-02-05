@@ -4,5 +4,5 @@ use actix_web::{post, HttpResponse};
 #[post("/logout")]
 async fn post_logout(id: Identity) -> HttpResponse {
     id.forget();
-    HttpResponse::Found().header("location", "/").finish()
+    HttpResponse::Ok().finish()
 }

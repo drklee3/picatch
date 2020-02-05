@@ -1,18 +1,12 @@
-use crate::auth::verify;
+use crate::auth::crypto::verify;
 use crate::error::{Error, Result};
+use crate::model::auth::AuthData;
 use crate::model::pool::Pool;
 use crate::model::store::{Session, User};
 use actix_identity::Identity;
-use actix_web::{error::BlockingError, post, web, HttpRequest, HttpResponse};
+use actix_web::{post, web, HttpRequest, HttpResponse};
 use diesel::insert_into;
 use diesel::prelude::*;
-use serde::Deserialize;
-
-#[derive(Debug, Deserialize)]
-pub struct AuthData {
-    pub username: String,
-    pub password: String,
-}
 
 #[post("/login")]
 async fn post_login(
