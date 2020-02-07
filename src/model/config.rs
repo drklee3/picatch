@@ -4,13 +4,13 @@ use std::fs;
 use std::str::FromStr;
 use toml;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct Config {
     pub secret_key: Option<String>,
-    pub database: DbConfig,
+    pub database: Option<DbConfig>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct DbConfig {
     pub url: Option<String>,
     pub username: Option<String>,
@@ -37,7 +37,11 @@ impl Config {
 
     /// Check either if a database url or equivalent fields exist
     pub fn is_valid(&self) -> bool {
-        let db = &self.database;
+        let db = match &self.database {
+            Some(db) => db,
+            None => return false,
+        };
+
         if db.url.is_some() {
             return true;
         }
@@ -50,11 +54,12 @@ impl Config {
     /// Converts config to a database url.  If a database url is provided in the
     /// config, it will have priority.
     pub fn to_url(&self) -> Option<String> {
-        let db = &self.database;
-
         if !self.is_valid() {
             return None;
         }
+
+        // Okay to unwrap since is_valid() requires self.database to be Some
+        let db = &self.database.clone().unwrap();
 
         if db.url.is_some() {
             return db.url.clone();
