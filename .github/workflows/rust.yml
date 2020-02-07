@@ -11,6 +11,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: sudo apt-get install -y libpq-dev
+    - name: Create empty config
+      run: touch config.toml
     - name: Build
       run: cargo build --verbose
     - name: Run tests

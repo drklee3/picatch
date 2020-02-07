@@ -13,7 +13,8 @@ lazy_static::lazy_static! {
 
 fn get_secret_key() -> Result<String> {
     // Abort on read config errors -- if we can't read config for db info then
-    // we don't exactly need this either
+    // we don't exactly need this either I guess
+    // This means we don't have to handle file not found errors separately
     let mut config = Config::get_from_file()?;
 
     // If it exists, we don't need to do anything further, just return it
