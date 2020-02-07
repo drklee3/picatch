@@ -6,8 +6,8 @@ use toml;
 
 #[derive(Deserialize, Serialize)]
 pub struct Config {
-    pub database: DbConfig,
     pub secret_key: Option<String>,
+    pub database: DbConfig,
 }
 
 #[derive(Deserialize, Serialize)]
