@@ -61,24 +61,25 @@ async fn main() -> Result<()> {
             // enable logger - register logger last!
             .wrap(middleware::Logger::default())
             .service(
-                // Serve static files
-                fs::Files::new("/", "./static/")
-                    .show_files_listing()
-                    .index_file("index.html"),
-            )
-            .service(
                 web::scope("/api")
                     // AUTH routes
                     // POST /login
                     .service(api::post_login)
                     // POST /logout
                     .service(api::post_logout)
+                    .service(api::get_username_exists)
                     .service(api::get_index)
                     // API endpoints
                     // GET /album/{album}
                     .service(api::get_album)
                     // GET /image/{image}
                     .service(api::get_image),
+            )
+            .service(
+                // Serve static files
+                fs::Files::new("/", "./static/")
+                    .show_files_listing()
+                    .index_file("index.html"),
             )
     })
     .bind("127.0.0.1:8080")?

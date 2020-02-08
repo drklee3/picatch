@@ -25,8 +25,10 @@ async fn post_register(
 }
 
 fn register_query(auth_data: AuthData, pool: web::Data<Pool>) -> Result<User> {
-    use crate::schema::users::dsl::{username, users};
+    use crate::schema::users::dsl::users;
     let conn = &pool.get().unwrap();
+
+    // Also check if username already taken when filling in the form?
 
     let new_user = NewUser {
         username: auth_data.username,
