@@ -1,8 +1,8 @@
 use crate::error::Result;
 use crate::model::pool::Pool;
 use actix_web::{get, web, HttpResponse};
-use diesel::{RunQueryDsl};
 use diesel::dsl::count;
+use diesel::RunQueryDsl;
 use diesel::{ExpressionMethods, QueryDsl};
 use serde::{Deserialize, Serialize};
 
@@ -13,6 +13,7 @@ pub struct UserData {
 
 #[derive(Debug, Serialize)]
 pub struct Response {
+    pub username: String,
     pub exists: bool,
 }
 
@@ -21,13 +22,17 @@ pub async fn get_username_exists(
     web::Query(user_data): web::Query<UserData>,
     pool: web::Data<Pool>,
 ) -> Result<HttpResponse> {
-    let exists = web::block(move || username_exists_query(user_data.username, pool)).await?;
+    let username = user_data.username.clone();
+    let exists = web::block(move || username_exists_query(username, pool)).await?;
 
-    Ok(HttpResponse::Ok().json(Response {exists}))
+    Ok(HttpResponse::Ok().json(Response {
+        username: user_data.username,
+        exists,
+    }))
 }
 
 fn username_exists_query(query_username: String, pool: web::Data<Pool>) -> Result<bool> {
-    use crate::schema::users::dsl::{users, username};
+    use crate::schema::users::dsl::{username, users};
     let conn = &pool.get().unwrap();
 
     users
