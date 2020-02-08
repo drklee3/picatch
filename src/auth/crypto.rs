@@ -4,8 +4,6 @@ use crate::model::config::Config;
 use argonautica::{Hasher, Verifier};
 use rand::distributions::Alphanumeric;
 use rand::Rng;
-use std::fs;
-use std::io::Write;
 
 lazy_static::lazy_static! {
     static ref SECRET_KEY: String = get_secret_key().expect("Failed to get secret key");

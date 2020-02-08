@@ -2,7 +2,7 @@ use crate::error::{Error, Result};
 use crate::model::pool::Pool;
 use crate::model::store::{Session, User};
 use actix_identity::Identity;
-use actix_web::{post, web};
+use actix_web::web;
 use diesel::prelude::*;
 
 /// Responds error if user already logged in, else does nothing.  If a session is

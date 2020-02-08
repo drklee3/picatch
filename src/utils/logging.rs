@@ -1,9 +1,9 @@
 use crate::error::Result;
 use chrono;
-use std::sync::mpsc::channel;
-use std::thread;
 use fern;
 use fern::colors::{Color, ColoredLevelConfig};
+use std::sync::mpsc::channel;
+use std::thread;
 
 pub fn setup_logger() -> Result<()> {
     let (tx, rx) = channel();
