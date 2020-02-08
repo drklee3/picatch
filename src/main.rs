@@ -12,12 +12,10 @@ use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
 use diesel_migrations::run_pending_migrations;
 use dotenv;
-
 use dphoto_lib::*;
+use error::Result;
 use model::config::Config;
 use model::pool::Pool;
-
-use error::Result;
 
 // Embed SQL migrations into compiled binary
 embed_migrations!("migrations");
@@ -25,8 +23,7 @@ embed_migrations!("migrations");
 #[actix_rt::main]
 async fn main() -> Result<()> {
     dotenv::dotenv().ok();
-    std::env::set_var("RUST_LOG", "debug");
-    env_logger::init();
+    utils::logging::setup_logger()?;
 
     // Exit if no config found
     let config = Config::get_from_file()?;

@@ -2,7 +2,9 @@ use actix_web::{error::BlockingError, HttpResponse, ResponseError};
 use argonautica::Error as ArgonauticaError;
 use diesel::result::{DatabaseErrorKind, Error as DieselError};
 use diesel_migrations::RunMigrationsError;
+use fern::InitError as FernError;
 use image::ImageError;
+use log::SetLoggerError;
 use std::error::Error as StdError;
 use std::fmt::Error as FmtError;
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -19,6 +21,8 @@ pub type Result<T> = StdResult<T, Error>;
 pub enum Error {
     /// `argonautica` error
     Argonautica(ArgonauticaError),
+    /// `fern` error
+    Fern(FernError),
     /// `std::fmt` error
     Fmt(FmtError),
     /// `image` error
@@ -27,6 +31,8 @@ pub enum Error {
     Io(IoError),
     /// `diesel_migrations` error
     Migrations(RunMigrationsError),
+    /// `log` set_logger error
+    SetLogger(SetLoggerError),
     /// `toml` deserialize error
     TomlDe(TomlDeError),
     /// `toml` serialize error
@@ -40,6 +46,12 @@ pub enum Error {
 impl From<ArgonauticaError> for Error {
     fn from(err: ArgonauticaError) -> Error {
         Error::Argonautica(err)
+    }
+}
+
+impl From<FernError> for Error {
+    fn from(err: FernError) -> Error {
+        Error::Fern(err)
     }
 }
 
@@ -64,6 +76,12 @@ impl From<IoError> for Error {
 impl From<RunMigrationsError> for Error {
     fn from(err: RunMigrationsError) -> Error {
         Error::Migrations(err)
+    }
+}
+
+impl From<SetLoggerError> for Error {
+    fn from(err: SetLoggerError) -> Error {
+        Error::SetLogger(err)
     }
 }
 
@@ -112,9 +130,11 @@ impl Display for Error {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         match *self {
             Error::Argonautica(ref inner) => inner.fmt(f),
+            Error::Fern(ref inner) => inner.fmt(f),
             Error::Fmt(ref inner) => inner.fmt(f),
             Error::Image(ref inner) => inner.fmt(f),
             Error::Migrations(ref inner) => inner.fmt(f),
+            Error::SetLogger(ref inner) => inner.fmt(f),
             Error::Io(ref inner) => inner.fmt(f),
             Error::TomlDe(ref inner) => inner.fmt(f),
             Error::TomlSe(ref inner) => inner.fmt(f),
@@ -128,9 +148,11 @@ impl Display for Error {
 impl StdError for Error {
     fn description(&self) -> &str {
         match *self {
+            Error::Fern(ref inner) => inner.description(),
             Error::Fmt(ref inner) => inner.description(),
             Error::Image(ref inner) => inner.description(),
             Error::Migrations(ref inner) => inner.description(),
+            Error::SetLogger(ref inner) => inner.description(),
             Error::Io(ref inner) => inner.description(),
             Error::TomlDe(ref inner) => inner.description(),
             Error::TomlSe(ref inner) => inner.description(),

@@ -23,11 +23,13 @@ pub struct DbConfig {
 
 impl Config {
     pub fn get_from_file() -> Result<Self> {
-        fs::read_to_string("config.toml").map_err(|e| {
-            error!("Failed to read config.toml from file");
+        fs::read_to_string("config.toml")
+            .map_err(|e| {
+                error!("Failed to read config.toml from file");
 
-            e
-        })?.parse()
+                e
+            })?
+            .parse()
     }
 
     pub fn save_to_file(&self) -> Result<()> {
