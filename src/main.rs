@@ -34,7 +34,7 @@ async fn main() -> Result<()> {
     let pool: Pool = r2d2::Pool::builder()
         // TODO: Remove this, just added cause I'm lazy and using a free ElephantSQL
         // database with max 5 concurrent connections
-        .max_size(5)
+        .max_size(2)
         .build(manager)
         .expect("Failed to create pool :'(");
 
@@ -63,6 +63,7 @@ async fn main() -> Result<()> {
             .service(
                 web::scope("/api")
                     // AUTH routes
+                    .service(api::post_register)
                     // POST /login
                     .service(api::post_login)
                     // POST /logout

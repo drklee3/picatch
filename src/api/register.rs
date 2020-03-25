@@ -13,7 +13,7 @@ use diesel::{insert_into, RunQueryDsl};
 
 #[post("/register")]
 async fn post_register(
-    auth_data: web::Json<AuthData>,
+    auth_data: web::Form<AuthData>,
     id: Identity,
     pool: web::Data<Pool>,
 ) -> Result<HttpResponse> {

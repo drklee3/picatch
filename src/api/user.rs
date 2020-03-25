@@ -39,6 +39,6 @@ fn username_exists_query(query_username: String, pool: web::Data<Pool>) -> Resul
         .select(count(username))
         .filter(username.eq(query_username))
         .first(conn)
-        .map(|count: i64| count == 1)
+        .map(|count: i64| count != 0)
         .map_err(Into::into)
 }

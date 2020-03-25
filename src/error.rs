@@ -5,6 +5,7 @@ use diesel_migrations::RunMigrationsError;
 use fern::InitError as FernError;
 use image::ImageError;
 use log::SetLoggerError;
+use serde::{Deserialize, Serialize};
 use std::error::Error as StdError;
 use std::fmt::Error as FmtError;
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -164,16 +165,31 @@ impl StdError for Error {
     }
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct JsonErrorResponse {
+    pub status: String,
+    pub message: String,
+}
+
 impl ResponseError for Error {
     fn error_response(&self) -> HttpResponse {
         match self {
             Error::Image(_) => HttpResponse::NotFound().finish(),
             Error::Io(_) => HttpResponse::InternalServerError().finish(),
             Error::InternalServerError => {
-                HttpResponse::InternalServerError().json("Internal Server Error, Please try later")
+                HttpResponse::InternalServerError().json(JsonErrorResponse {
+                    status: "InternalServerError".into(),
+                    message: "Internal Server Error, Please try later".into(),
+                })
             }
-            Error::BadRequest(ref message) => HttpResponse::BadRequest().json(message),
-            Error::Unauthorized => HttpResponse::Unauthorized().json("Unauthorized"),
+            Error::BadRequest(ref message) => HttpResponse::BadRequest().json(JsonErrorResponse {
+                status: "BadRequest".into(),
+                message: message.into(),
+            }),
+            Error::Unauthorized => HttpResponse::Unauthorized().json(JsonErrorResponse {
+                status: "Unauthorized".into(),
+                message: "Unauthorized".into(),
+            }),
             _ => HttpResponse::InternalServerError().finish(),
         }
     }
