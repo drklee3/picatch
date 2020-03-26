@@ -10,7 +10,7 @@ use diesel::prelude::*;
 
 #[post("/login")]
 async fn post_login(
-    auth_data: web::Json<AuthData>,
+    auth_data: web::Form<AuthData>,
     id: Identity,
     pool: web::Data<Pool>,
     req: HttpRequest,
@@ -47,12 +47,18 @@ fn login_query(auth_data: AuthData, pool: web::Data<Pool>) -> Result<User> {
         .filter(username.eq(&auth_data.username))
         .load::<User>(conn)?;
 
-    if let Some(user) = items.pop() {
-        if let Ok(matching) = verify(&user.hash, &auth_data.password) {
+    if let Some(attempted_user) = items.pop() {
+        if let Ok(matching) = verify(&attempted_user.hash, &auth_data.password) {
             if matching {
-                return Ok(user);
+                return Ok(attempted_user);
             }
+
+            // Wrong password
+            return Err(Error::BadRequest("Incorrect username or password".into()));
         }
+
+        // Something went wrong :O
+        return Err(Error::InternalServerError);
     }
 
     Err(Error::Unauthorized)

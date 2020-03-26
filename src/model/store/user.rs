@@ -2,7 +2,7 @@ use crate::schema::users;
 use chrono;
 use serde_derive::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize, Associations, Queryable, Identifiable)]
+#[derive(Debug, Deserialize, Serialize, Associations, Queryable, Identifiable)]
 pub struct User {
     pub id: i32,
     pub username: String,

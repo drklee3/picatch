@@ -69,6 +69,7 @@ async fn main() -> Result<()> {
                     // POST /logout
                     .service(api::post_logout)
                     .service(api::get_username_exists)
+                    .service(api::get_current_user)
                     .service(api::get_index)
                     // API endpoints
                     // GET /album/{album}

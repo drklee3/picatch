@@ -1,6 +1,8 @@
-use crate::error::Result;
+use crate::error::{Error, Result};
 use crate::model::pool::Pool;
+use crate::auth::session::get_session_user;
 use actix_web::{get, web, HttpResponse};
+use actix_identity::Identity;
 use diesel::dsl::count;
 use diesel::RunQueryDsl;
 use diesel::{ExpressionMethods, QueryDsl};
@@ -41,4 +43,20 @@ fn username_exists_query(query_username: String, pool: web::Data<Pool>) -> Resul
         .first(conn)
         .map(|count: i64| count != 0)
         .map_err(Into::into)
+}
+
+#[get("/current_user")]
+pub async fn get_current_user(
+    id: Identity,
+    pool: web::Data<Pool>,
+) -> Result<HttpResponse> {
+    let session_id = if let Some(session_id) = id.identity() {
+        session_id
+    } else {
+        return Err(Error::Unauthorized);
+    };
+
+    let current_user = web::block(move || get_session_user(&session_id, pool)).await?;
+
+    Ok(HttpResponse::Ok().json(current_user))
 }
