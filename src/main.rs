@@ -95,7 +95,7 @@ fn render_dir(dir: &fs::Directory, req: &HttpRequest
         req.clone(),
         HttpResponse::Ok().json(
             DirectoryListing {
-                current: req.path().to_string(),
+                current: dir.base.to_string_lossy().to_string(),
                 files,
             }
         )
@@ -119,14 +119,14 @@ async fn main() -> Result<()> {
             ))
             // enable logger - register logger last!
             .wrap(middleware::Logger::default())
+            .service(fs::Files::new("/photos", "./photos/")
+                .files_listing_renderer(render_dir)
+                .show_files_listing()
+            )
             .service(
-                web::scope("/api")
-                    .default_service(
-                        // Serve static files
-                        fs::Files::new("/", "./static/")
-                            .show_files_listing()
-                            .files_listing_renderer(render_dir)
-                    )
+                // TODO: Keep static files in memory?
+                fs::Files::new("/", "./static")
+                    .index_file("index.html")
             )
 
     })
