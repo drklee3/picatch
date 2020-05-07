@@ -12,7 +12,7 @@ use std::path::Path;
 use error::Result;
 use std::result::Result as StdResult;
 use std::io::{self, BufReader};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::fs::File;
 use serde::Serialize;
 
@@ -26,7 +26,7 @@ enum DirectoryItemType {
 struct DirectoryItem {
     r#type: DirectoryItemType,
     name: String,
-    exif: Option<HashMap<String, String>>,
+    exif: Option<BTreeMap<String, String>>,
 }
 
 #[derive(Debug, Serialize)]
@@ -35,13 +35,13 @@ struct DirectoryListing {
     files: Vec<DirectoryItem>,
 }
 
-fn get_exif_data(path: &Path) -> Option<HashMap<String, String>> {
+fn get_exif_data(path: &Path) -> Option<BTreeMap<String, String>> {
     let file = File::open(path).ok()?;
     let mut bufreader = BufReader::new(&file);
     let exifreader = exif::Reader::new();
     let exif = exifreader.read_from_container(&mut bufreader).ok()?;
 
-    let mut exif_map = HashMap::new();
+    let mut exif_map = BTreeMap::new();
     for f in exif.fields() {
         if let Some(tag_name) = f.tag.description() {
             exif_map.insert(tag_name.to_string(), f.display_value().with_unit(&exif).to_string());
