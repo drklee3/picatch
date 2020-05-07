@@ -7,49 +7,68 @@ extern crate diesel_migrations;
 use actix_files as fs;
 use actix_http::cookie::SameSite;
 use actix_identity::{CookieIdentityPolicy, IdentityService};
-use actix_web::{middleware, web, App, HttpServer};
-use diesel::prelude::*;
-use diesel::r2d2::{self, ConnectionManager};
-use diesel_migrations::run_pending_migrations;
+use actix_web::{middleware, web, App, HttpServer, HttpRequest, HttpResponse};
+use actix_web::dev::ServiceResponse;
 use dotenv;
 use dphoto_lib::*;
+use std::path::Path;
 use error::Result;
-use model::config::Config;
-use model::pool::Pool;
+use std::result::Result as StdResult;
+use std::io;
+use serde::Serialize;
 
-// Embed SQL migrations into compiled binary
-embed_migrations!("migrations");
+#[derive(Debug, Serialize)]
+struct DirectoryListing {
+    current: String,
+    files: Vec<String>,
+}
+
+fn render_dir(dir: &fs::Directory, req: &HttpRequest
+) -> StdResult<ServiceResponse, io::Error> {
+    let base = Path::new(req.path());
+    let mut files = Vec::new();
+
+    for entry in dir.path.read_dir()? {
+        if dir.is_visible(&entry) {
+            let entry = entry.unwrap();
+
+            let p = match entry.path().strip_prefix(&dir.path) {
+                Ok(p) if cfg!(windows) => base.join(p).to_string_lossy().replace("\\", "/"),
+                Ok(p) => base.join(p).to_string_lossy().into_owned(),
+                Err(_) => continue,
+            };
+
+            // if file is a directory, add '/' to the end of the name
+            if let Ok(metadata) = entry.metadata() {
+                if metadata.is_dir() {
+                    files.push(format!("{}/", entry.file_name().to_string_lossy().to_string()));
+                } else {
+                    files.push(entry.file_name().to_string_lossy().to_string());
+                }
+            } else {
+                continue;
+            }
+        }
+    }
+
+    Ok(ServiceResponse::new(
+        req.clone(),
+        HttpResponse::Ok().json(
+            DirectoryListing {
+                current: req.path().to_string(),
+                files,
+            }
+        )
+    ))
+}
 
 #[actix_rt::main]
 async fn main() -> Result<()> {
     dotenv::dotenv().ok();
     utils::logging::setup_logger()?;
 
-    // Exit if no config found
-    let config = Config::get_from_file()?;
-    let db_url = config.to_url().expect("Invalid database url");
-
-    // Connect to database and create connection pool with r2d2
-    let manager = ConnectionManager::<PgConnection>::new(db_url);
-    let pool: Pool = r2d2::Pool::builder()
-        // TODO: Remove this, just added cause I'm lazy and using a free ElephantSQL
-        // database with max 5 concurrent connections
-        .max_size(2)
-        .build(manager)
-        .expect("Failed to create pool :'(");
-
-    debug!("Connected to database");
-
-    {
-        // New scope so this connection gets dropped after migrations
-        let conn = &pool.get().unwrap();
-        run_pending_migrations(conn)?;
-        debug!("Pending migrations finished");
-    }
-
     HttpServer::new(move || {
         App::new()
-            .data(pool.clone())
             .data(web::JsonConfig::default().limit(4096))
             .wrap(IdentityService::new(
                 // TODO: Update secret key with an actual secret key
@@ -60,6 +79,7 @@ async fn main() -> Result<()> {
             ))
             // enable logger - register logger last!
             .wrap(middleware::Logger::default())
+            /*
             .service(
                 web::scope("/api")
                     // AUTH routes
@@ -77,11 +97,13 @@ async fn main() -> Result<()> {
                     // GET /image/{image}
                     .service(api::get_image),
             )
-            .service(
+            */
+            .default_service(
                 // Serve static files
                 fs::Files::new("/", "./static/")
                     .show_files_listing()
-                    .index_file("index.html"),
+                    .files_listing_renderer(render_dir)
+                    //.index_file("index.html"),
             )
     })
     .bind("127.0.0.1:8080")?

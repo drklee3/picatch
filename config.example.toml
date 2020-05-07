@@ -1,7 +1,0 @@
-[database]
-url = "postgres://user:pass@host:port/db"
-username = "postgres"
-password = "database pasword"
-host = "localhost"
-port = "could be omitted to use default 5432 port"
-name = "database name"
