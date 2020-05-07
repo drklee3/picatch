@@ -18,18 +18,13 @@ actix-http = "1.0.1"
 actix-identity = "0.2.1"
 actix-rt = "1.0.0"
 actix-web = "2.0.0"
-argonautica = "0.2.0"
-base64 = "0.11.0"
-byte-unit = "3.0.3"
-diesel_migrations = "1.4.0"
 dotenv = "0.15.0"
 futures = "0.3.1"
 image = "0.22.3"
-ipnetwork = "0.15.1"
+kamadak-exif = "0.5.1"
 lazy_static = "1.4.0"
 log = "0.4.8"
 rand = "0.7.2"
-rand_chacha = "0.2.1"
 serde = "1.0.103"
 serde_derive = "1.0.103"
 toml = "0.5.5"
@@ -37,10 +32,6 @@ toml = "0.5.5"
 [dependencies.chrono]
 version = "0.4.10"
 features = ["serde"]
-
-[dependencies.diesel]
-version = "1.4.3"
-features = ["postgres", "r2d2", "chrono", "network-address"]
 
 [dependencies.fern]
 version = "0.5.9"

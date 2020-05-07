@@ -1,9 +1,6 @@
 #[macro_use]
 extern crate log;
 
-#[macro_use]
-extern crate diesel_migrations;
-
 use actix_files as fs;
 use actix_http::cookie::SameSite;
 use actix_identity::{CookieIdentityPolicy, IdentityService};
@@ -14,13 +11,44 @@ use dphoto_lib::*;
 use std::path::Path;
 use error::Result;
 use std::result::Result as StdResult;
-use std::io;
+use std::io::{self, BufReader};
+use std::collections::HashMap;
+use std::fs::File;
 use serde::Serialize;
+
+#[derive(Debug, Serialize)]
+enum DirectoryItemType {
+    Dir,
+    File,
+}
+
+#[derive(Debug, Serialize)]
+struct DirectoryItem {
+    r#type: DirectoryItemType,
+    name: String,
+    exif: Option<HashMap<String, String>>,
+}
 
 #[derive(Debug, Serialize)]
 struct DirectoryListing {
     current: String,
-    files: Vec<String>,
+    files: Vec<DirectoryItem>,
+}
+
+fn get_exif_data(path: &Path) -> Option<HashMap<String, String>> {
+    let file = File::open(path).ok()?;
+    let mut bufreader = BufReader::new(&file);
+    let exifreader = exif::Reader::new();
+    let exif = exifreader.read_from_container(&mut bufreader).ok()?;
+
+    let mut exif_map = HashMap::new();
+    for f in exif.fields() {
+        if let Some(tag_name) = f.tag.description() {
+            exif_map.insert(tag_name.to_string(), f.display_value().with_unit(&exif).to_string());
+        }
+    }
+
+    Some(exif_map)
 }
 
 fn render_dir(dir: &fs::Directory, req: &HttpRequest
@@ -41,9 +69,21 @@ fn render_dir(dir: &fs::Directory, req: &HttpRequest
             // if file is a directory, add '/' to the end of the name
             if let Ok(metadata) = entry.metadata() {
                 if metadata.is_dir() {
-                    files.push(format!("{}/", entry.file_name().to_string_lossy().to_string()));
+                    let dir_item = DirectoryItem {
+                        r#type: DirectoryItemType::Dir,
+                        name: format!("{}/", entry.file_name().to_string_lossy().to_string()),
+                        exif: None,
+                    };
+
+                    files.push(dir_item);
                 } else {
-                    files.push(entry.file_name().to_string_lossy().to_string());
+                    let dir_item = DirectoryItem {
+                        r#type: DirectoryItemType::File,
+                        name: entry.file_name().to_string_lossy().to_string(),
+                        exif: get_exif_data(&entry.path()),
+                    };
+
+                    files.push(dir_item);
                 }
             } else {
                 continue;
@@ -79,32 +119,16 @@ async fn main() -> Result<()> {
             ))
             // enable logger - register logger last!
             .wrap(middleware::Logger::default())
-            /*
             .service(
                 web::scope("/api")
-                    // AUTH routes
-                    .service(api::post_register)
-                    // POST /login
-                    .service(api::post_login)
-                    // POST /logout
-                    .service(api::post_logout)
-                    .service(api::get_username_exists)
-                    .service(api::get_current_user)
-                    .service(api::get_index)
-                    // API endpoints
-                    // GET /album/{album}
-                    .service(api::get_album)
-                    // GET /image/{image}
-                    .service(api::get_image),
+                    .default_service(
+                        // Serve static files
+                        fs::Files::new("/", "./static/")
+                            .show_files_listing()
+                            .files_listing_renderer(render_dir)
+                    )
             )
-            */
-            .default_service(
-                // Serve static files
-                fs::Files::new("/", "./static/")
-                    .show_files_listing()
-                    .files_listing_renderer(render_dir)
-                    //.index_file("index.html"),
-            )
+
     })
     .bind("127.0.0.1:8080")?
     .run()

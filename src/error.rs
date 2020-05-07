@@ -1,7 +1,4 @@
 use actix_web::{error::BlockingError, HttpResponse, ResponseError};
-use argonautica::Error as ArgonauticaError;
-use diesel::result::{DatabaseErrorKind, Error as DieselError};
-use diesel_migrations::RunMigrationsError;
 use fern::InitError as FernError;
 use image::ImageError;
 use log::SetLoggerError;
@@ -20,8 +17,6 @@ pub type Result<T> = StdResult<T, Error>;
 /// Common error type to hold errors from other crates
 #[derive(Debug)]
 pub enum Error {
-    /// `argonautica` error
-    Argonautica(ArgonauticaError),
     /// `fern` error
     Fern(FernError),
     /// `std::fmt` error
@@ -30,8 +25,6 @@ pub enum Error {
     Image(ImageError),
     /// `std::io` error
     Io(IoError),
-    /// `diesel_migrations` error
-    Migrations(RunMigrationsError),
     /// `log` set_logger error
     SetLogger(SetLoggerError),
     /// `toml` deserialize error
@@ -43,13 +36,6 @@ pub enum Error {
     BadRequest(String),
     InternalServerError,
 }
-
-impl From<ArgonauticaError> for Error {
-    fn from(err: ArgonauticaError) -> Error {
-        Error::Argonautica(err)
-    }
-}
-
 impl From<FernError> for Error {
     fn from(err: FernError) -> Error {
         Error::Fern(err)
@@ -74,12 +60,6 @@ impl From<IoError> for Error {
     }
 }
 
-impl From<RunMigrationsError> for Error {
-    fn from(err: RunMigrationsError) -> Error {
-        Error::Migrations(err)
-    }
-}
-
 impl From<SetLoggerError> for Error {
     fn from(err: SetLoggerError) -> Error {
         Error::SetLogger(err)
@@ -98,23 +78,6 @@ impl From<TomlSeError> for Error {
     }
 }
 
-impl From<DieselError> for Error {
-    fn from(error: DieselError) -> Error {
-        // Right now we just care about UniqueViolation from diesel
-        // But this would be helpful to easily map errors as our app grows
-        match error {
-            DieselError::DatabaseError(kind, info) => {
-                if let DatabaseErrorKind::UniqueViolation = kind {
-                    let message = info.details().unwrap_or_else(|| info.message()).to_string();
-                    return Error::BadRequest(message);
-                }
-                Error::InternalServerError
-            }
-            _ => Error::InternalServerError,
-        }
-    }
-}
-
 // Actix web::block response, we can just use ? to handle blocking calls now
 // like so:  web::block(...).await?
 // Instead of having to do a match for every blocking call
@@ -130,11 +93,9 @@ impl From<BlockingError<Error>> for Error {
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         match *self {
-            Error::Argonautica(ref inner) => inner.fmt(f),
             Error::Fern(ref inner) => inner.fmt(f),
             Error::Fmt(ref inner) => inner.fmt(f),
             Error::Image(ref inner) => inner.fmt(f),
-            Error::Migrations(ref inner) => inner.fmt(f),
             Error::SetLogger(ref inner) => inner.fmt(f),
             Error::Io(ref inner) => inner.fmt(f),
             Error::TomlDe(ref inner) => inner.fmt(f),
@@ -152,7 +113,6 @@ impl StdError for Error {
             Error::Fern(ref inner) => inner.description(),
             Error::Fmt(ref inner) => inner.description(),
             Error::Image(ref inner) => inner.description(),
-            Error::Migrations(ref inner) => inner.description(),
             Error::SetLogger(ref inner) => inner.description(),
             Error::Io(ref inner) => inner.description(),
             Error::TomlDe(ref inner) => inner.description(),
