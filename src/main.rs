@@ -43,9 +43,8 @@ fn get_exif_data(path: &Path) -> Option<BTreeMap<String, String>> {
 
     let mut exif_map = BTreeMap::new();
     for f in exif.fields() {
-        if let Some(tag_name) = f.tag.description() {
-            exif_map.insert(tag_name.to_string(), f.display_value().with_unit(&exif).to_string());
-        }
+        let key = format!("{}", f.tag);
+        exif_map.insert(key, f.display_value().with_unit(&exif).to_string());
     }
 
     Some(exif_map)
@@ -102,6 +101,10 @@ fn render_dir(dir: &fs::Directory, req: &HttpRequest
     ))
 }
 
+async fn index(req: HttpRequest) -> Result<fs::NamedFile> {
+    Ok(fs::NamedFile::open("./static/dist/index.html")?)
+}
+
 #[actix_rt::main]
 async fn main() -> Result<()> {
     dotenv::dotenv().ok();
@@ -125,8 +128,12 @@ async fn main() -> Result<()> {
             )
             .service(
                 // TODO: Keep static files in memory?
-                fs::Files::new("/", "./static")
+                fs::Files::new("/", "./static/dist")
                     .index_file("index.html")
+            )
+            .default_service(
+                web::resource("")
+                    .route(web::get().to(index))
             )
 
     })
