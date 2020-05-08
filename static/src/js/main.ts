@@ -1,6 +1,3 @@
-import {getCurrentAlbum} from "./api";
-import {getCurrentAlbumPath} from "./routing";
-import {displayAlbum} from "./dom";
 import Router from "./router";
 
 async function main() {

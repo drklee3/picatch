@@ -13,11 +13,36 @@
                 top: 0;
                 left: 0;
             }
+
+            #album {
+                display: flex;
+                flex-wrap: wrap;
+                list-style: none;
+            }
+
+            #album li {
+                height: 40vh;
+                flex-grow: 1;
+                flex-basis: content;
+            }
+
+            #album li:last-child {
+                flex-grow: 10;
+            }
+
+            .img {
+                max-height: 100%;
+                max-width: 100%;
+                min-width: 100%;
+                width: auto;
+                object-fit: cover;
+                display: block;
+            }
         </style>
     </head>
     <body>
         <p id="albumName"></p>
-        <div id="album"></div>
+        <ul id="album"></ul>
         <a href="" id="upAlbum">up album</a>
 
         <script src="js/main.ts"></script>

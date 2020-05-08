@@ -48,11 +48,14 @@ export default class Router {
             return;
         }
 
+        // Actually want to modify parent
+        const parent = target.parentElement;
+
         // Toggle active class
-        if (target.classList.contains("active")) {
-            this.closeImage(target);
+        if (parent.classList.contains("active")) {
+            this.closeImage(parent);
         } else {
-            this.openImage(target);
+            this.openImage(parent);
         }
     }
 
@@ -108,6 +111,8 @@ export default class Router {
      * If on specific image path, get album containing image.
      */
     async updateCurrentAlbumData() {
+        // file is optional as defined in PathComponent.  (string | undefined)
+        // Not sure why typescript doesn't raise an error here
         const {album, file} = this.getPathComponent();
         const reqUrl = API_BASE_URL + album;
 

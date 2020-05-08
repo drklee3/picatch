@@ -6,22 +6,35 @@ function parseImageDimensions(item: DirectoryItem): [number, number] {
     }
 }
 
-function createImageElement(item: DirectoryItem, imgBasePath: string, active: boolean): HTMLImageElement | undefined {
-    const imageElement = new Image(300, 400);
+function createImageElement(item: DirectoryItem, imgBasePath: string, activeFile: string): HTMLElement | undefined {
+    // If dimensions missing, something probably went wrong reading the file
+    if (item.dimensions === undefined) {
+        return;
+    }
+
+    const wrapperElement = document.createElement("li");
+
+    const imageElement = new Image(item.dimensions.width, item.dimensions.height);
     imageElement.src = imgBasePath + item.name;
     if (imageElement.src === undefined) {
         return;
     }
 
+    imageElement.classList.add("img")
+
     // If currently active, add active class
-    if (active) {
-        imageElement.classList.add("active");
+    if (activeFile !== undefined && activeFile === item.name) {
+        wrapperElement.classList.add("active");
     }
 
-    // add filename to data attr
-    imageElement.setAttribute("data-filename", item.name);
+    // Add filename to data attr
+    wrapperElement.setAttribute("data-filename", item.name);
+    wrapperElement.id = item.name;
 
-    return imageElement;
+    // Put image into wrapper
+    wrapperElement.appendChild(imageElement);
+
+    return wrapperElement;
 }
 
 export function displayAlbum(album: DirectoryListing, imgBasePath: string, activeFile: string): void {
@@ -32,13 +45,17 @@ export function displayAlbum(album: DirectoryListing, imgBasePath: string, activ
             return;
         }
 
-        const element = createImageElement(e, imgBasePath, activeFile === e.name);
+        const element = createImageElement(e, imgBasePath, activeFile);
         if (element === undefined) {
             return;
         }
 
         albumElement.appendChild(element);
     })
+
+    // Insert empty list item so the last one grows
+    const emptyLi = document.createElement("li");
+    albumElement.appendChild(emptyLi);
 }
 
 export function setParentAlbumUrl(url: string) {

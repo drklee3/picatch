@@ -3,10 +3,16 @@ export enum DirectoryItemType {
   File = "File",
 }
 
+export interface ImageDimensions {
+    width: number;
+    height: number;
+}
+
 export interface DirectoryItem {
   type: DirectoryItemType;
   name: string
   exif: {[key: string]: string} | null;
+  dimensions?: ImageDimensions;
 }
 
 export interface DirectoryListing {
