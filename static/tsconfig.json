@@ -6,6 +6,7 @@
             "~*": ["./*"]
         },
         "module": "es2015",
+        "noEmit": true,
         "noImplicitAny": true,
         "removeComments": true,
         "sourceMap": true,
