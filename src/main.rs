@@ -15,6 +15,13 @@ use std::io::{self, BufReader};
 use std::collections::BTreeMap;
 use std::fs::File;
 use serde::Serialize;
+use image::image_dimensions;
+
+#[derive(Debug, Serialize)]
+struct ImageDimensions {
+    width: u32,
+    height: u32,
+}
 
 #[derive(Debug, Serialize)]
 enum DirectoryItemType {
@@ -26,7 +33,12 @@ enum DirectoryItemType {
 struct DirectoryItem {
     r#type: DirectoryItemType,
     name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     exif: Option<BTreeMap<String, String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    dimensions: Option<ImageDimensions>,
 }
 
 #[derive(Debug, Serialize)]
@@ -48,6 +60,13 @@ fn get_exif_data(path: &Path) -> Option<BTreeMap<String, String>> {
     }
 
     Some(exif_map)
+}
+
+fn get_image_dimensions(path: &Path) -> Option<ImageDimensions> {
+    image_dimensions(path).ok().map(|x| ImageDimensions {
+        width: x.0,
+        height: x.1,
+    })
 }
 
 fn render_dir(dir: &fs::Directory, req: &HttpRequest
@@ -72,6 +91,7 @@ fn render_dir(dir: &fs::Directory, req: &HttpRequest
                         r#type: DirectoryItemType::Dir,
                         name: format!("{}/", entry.file_name().to_string_lossy().to_string()),
                         exif: None,
+                        dimensions: None,
                     };
 
                     files.push(dir_item);
@@ -80,6 +100,7 @@ fn render_dir(dir: &fs::Directory, req: &HttpRequest
                         r#type: DirectoryItemType::File,
                         name: entry.file_name().to_string_lossy().to_string(),
                         exif: get_exif_data(&entry.path()),
+                        dimensions: get_image_dimensions(&entry.path()),
                     };
 
                     files.push(dir_item);
