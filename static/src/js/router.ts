@@ -1,5 +1,5 @@
 import {API_BASE_URL} from "./constants";
-import {DirectoryListing, DirectoryItem, DirectoryItemType} from "./types";
+import {DirectoryListing, DirectoryItem, DirectoryItemType, PathComponent} from "./types";
 import {displayAlbum} from "./dom";
 
 export default class Router {
@@ -11,7 +11,7 @@ export default class Router {
 
         // Setup click listner
         const albumElement = document.getElementById("album");
-        // uhh idk if this is a good idea but other naive way would cause a circular dependency
+        // Uhh idk if this is a good idea but other naive way would cause a circular dependency
         albumElement.addEventListener("click", this.handleImageClick.bind(this));
     }
 
@@ -25,7 +25,7 @@ export default class Router {
         const newPath = this.getAlbumPath() + target.dataset.filename;
 
         if (setPath) {
-            this.setPath(newPath);
+            this.setPath(newPath, target.dataset.filename);
         }
     }
 
@@ -65,23 +65,21 @@ export default class Router {
     }
 
     handlePopState(e: PopStateEvent) {
-        const path = e.state.path;
+        const {path, fileName} = e.state;
 
         if (!this.isNewAlbum(path)) {
             console.log("existing album : ", path);
-            // Same album, check if on image url
-            const imgName = this.getImageName(path);
 
             // Reset active images
             this.resetActiveImages();
 
-            if (!imgName) {
+            if (!fileName) {
                 // On an album so just do nothing else
                 return;
             }
 
             const albumElement = document.getElementById("album");
-            const imgElement = albumElement.querySelector(`[data-filename='${imgName}']`);
+            const imgElement = albumElement.querySelector(`[data-filename='${fileName}']`);
 
             // Found image, so let's set it active again.  Don't call setPath since we dont want a
             // second history entry
@@ -95,6 +93,9 @@ export default class Router {
         return this.updateCurrentAlbumData();
     }
 
+    /**
+     * Make an api request with specified response type
+     */
     async makeRequest<T>(request: RequestInfo): Promise<T> {
         const response = await fetch(request);
         const body = await response.json();
@@ -107,11 +108,13 @@ export default class Router {
      * If on specific image path, get album containing image.
      */
     async updateCurrentAlbumData() {
-        const reqUrl = API_BASE_URL + this.getAlbumPath();
+        const {album, file} = this.getPathComponent();
+        const reqUrl = API_BASE_URL + album;
 
         try {
             this.albumData = await this.makeRequest<DirectoryListing>(reqUrl);
-            displayAlbum(this.albumData, this.getAlbumImagePath());
+            // pass active file
+            displayAlbum(this.albumData, this.getAlbumImagePath(), file);
         } catch (e) {
             console.error(`Failed to get current album data: ${reqUrl}`, e);
         }
@@ -121,14 +124,17 @@ export default class Router {
         return window.location.pathname;
     }
 
-    setPath(path: string) {
-        console.log("setpath: ", path);
+    /**
+     * Sets the new path, updates browser url, and saves to history
+     * 
+     * @param path     new Path to set in browser url
+     * @param fileName Option filename to save in history
+     */
+    setPath(path: string, fileName: string = "") {
         // Update Title in Window's Tab
         document.title = path;
 
-        // Load content for this tab/page
-
-        window.history.pushState({path}, "", path);
+        window.history.pushState({path, fileName}, "", path);
     }
 
     /**
@@ -158,30 +164,40 @@ export default class Router {
     }
 
     /**
-     * If currently on photo url, returns the photo's album.
-     * If currently on album, returns album url (no change).
-     * 
-     * Default it uses 
+     * Gets current path's album and image if available
      */
-    getAlbumPath(path = this.getPath()): string {
+    getPathComponent(path = this.getPath()): PathComponent {
         // If already album path, return path
         if (path.endsWith("/")) {
-            return path;
+            return {album: path};
         }
 
         const imageName = this.getImageName(path);
-      
+
         // Remove imageName only if current path is on an image
         if (imageName) {
-          path = path.replace(imageName, "");
+            path = path.replace(imageName, "");
         }
 
         // Add slash if somehow missing a trailing slash
         if (!path.endsWith("/")) {
-          return path + "/";
+            path += "/";
         }
-      
-        return path;
+
+        return {
+            album: path,
+            file: imageName
+        };
+    }
+
+    /**
+     * If currently on photo url, returns the photo's album.
+     * If currently on album, returns album url (no change).
+     * 
+     * Default it uses current path, but a different path can be passed in to be parsed.
+     */
+    getAlbumPath(path = this.getPath()): string {
+        return this.getPathComponent(path).album;
     }
 
     isNewAlbum(newPath: string) {

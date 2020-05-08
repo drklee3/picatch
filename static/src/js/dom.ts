@@ -6,11 +6,16 @@ function parseImageDimensions(item: DirectoryItem): [number, number] {
     }
 }
 
-function createImageElement(item: DirectoryItem, imgBasePath: string): HTMLImageElement | undefined {
+function createImageElement(item: DirectoryItem, imgBasePath: string, active: boolean): HTMLImageElement | undefined {
     const imageElement = new Image(300, 400);
     imageElement.src = imgBasePath + item.name;
     if (imageElement.src === undefined) {
         return;
+    }
+
+    // If currently active, add active class
+    if (active) {
+        imageElement.classList.add("active");
     }
 
     // add filename to data attr
@@ -19,7 +24,7 @@ function createImageElement(item: DirectoryItem, imgBasePath: string): HTMLImage
     return imageElement;
 }
 
-export function displayAlbum(album: DirectoryListing, imgBasePath: string): void {
+export function displayAlbum(album: DirectoryListing, imgBasePath: string, activeFile: string): void {
     const albumElement = document.getElementById("album");
 
     album.files.forEach(e => {
@@ -27,7 +32,7 @@ export function displayAlbum(album: DirectoryListing, imgBasePath: string): void
             return;
         }
 
-        const element = createImageElement(e, imgBasePath);
+        const element = createImageElement(e, imgBasePath, activeFile === e.name);
         if (element === undefined) {
             return;
         }

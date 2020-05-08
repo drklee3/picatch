@@ -13,3 +13,8 @@ export interface DirectoryListing {
   current: string;
   files: DirectoryItem[];
 }
+
+export interface PathComponent {
+  album: string;
+  file: string | null;
+}
