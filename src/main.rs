@@ -123,7 +123,7 @@ fn render_dir(dir: &fs::Directory, req: &HttpRequest
 }
 
 async fn index(req: HttpRequest) -> Result<fs::NamedFile> {
-    Ok(fs::NamedFile::open("./static/dist/index.html")?)
+    Ok(fs::NamedFile::open("./static/public/index.html")?)
 }
 
 #[actix_rt::main]
@@ -149,7 +149,7 @@ async fn main() -> Result<()> {
             )
             .service(
                 // TODO: Keep static files in memory?
-                fs::Files::new("/", "./static/dist")
+                fs::Files::new("/", "./static/public")
                     .index_file("index.html")
             )
             .default_service(
