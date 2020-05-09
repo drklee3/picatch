@@ -3,6 +3,8 @@
 .env
 config.toml
 
+/photos/
+
 # Logs
 logs
 *.log

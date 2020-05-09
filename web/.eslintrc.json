@@ -1,0 +1,18 @@
+{
+    "eslintConfig": {
+        "extends": ["react-app", "shared-config"],
+        "rules": {
+            "additional-rule": "warn"
+        },
+        "overrides": [
+            {
+                "files": ["**/*.ts?(x)"],
+                "rules": {
+                    "additional-typescript-only-rule": "warn",
+                    "react-hooks/rules-of-hooks": "error",
+                    "react-hooks/exhaustive-deps": "warn"
+                }
+            }
+        ]
+    }
+}
