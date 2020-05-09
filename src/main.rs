@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate log;
 
+use actix_cors::Cors;
 use actix_files as fs;
 use actix_http::cookie::SameSite;
 use actix_identity::{CookieIdentityPolicy, IdentityService};
@@ -134,6 +135,12 @@ async fn main() -> Result<()> {
     HttpServer::new(move || {
         App::new()
             .data(web::JsonConfig::default().limit(4096))
+            .wrap(
+                Cors::new()
+                  .send_wildcard()
+                  .allowed_methods(vec!["GET", "POST"])
+                  .max_age(3600)
+                  .finish())
             .wrap(IdentityService::new(
                 // TODO: Update secret key with an actual secret key
                 CookieIdentityPolicy::new(&[0; 32])
