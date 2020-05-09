@@ -1,6 +1,6 @@
-import {API_BASE_URL} from "./constants";
-import {DirectoryListing, DirectoryItem, DirectoryItemType, PathComponent} from "./types";
-import {displayAlbum} from "./dom";
+import { API_BASE_URL } from "./constants";
+import { DirectoryListing, DirectoryItem, DirectoryItemType, PathComponent } from "../types";
+import { displayAlbum } from "./dom";
 
 export default class Router {
     public type: DirectoryItemType;
@@ -68,7 +68,7 @@ export default class Router {
     }
 
     handlePopState(e: PopStateEvent) {
-        const {path, fileName} = e.state;
+        const { path, fileName } = e.state;
 
         if (!this.isNewAlbum(path)) {
             console.log("existing album : ", path);
@@ -113,7 +113,7 @@ export default class Router {
     async updateCurrentAlbumData() {
         // file is optional as defined in PathComponent.  (string | undefined)
         // Not sure why typescript doesn't raise an error here
-        const {album, file} = this.getPathComponent();
+        const { album, file } = this.getPathComponent();
         const reqUrl = API_BASE_URL + album;
 
         try {
@@ -139,7 +139,7 @@ export default class Router {
         // Update Title in Window's Tab
         document.title = path;
 
-        window.history.pushState({path, fileName}, "", path);
+        window.history.pushState({ path, fileName }, "", path);
     }
 
     /**
@@ -152,7 +152,7 @@ export default class Router {
         }
 
         const filenameIndex = path.lastIndexOf("/") + 1;
-      
+
         const basename = path.substring(filenameIndex);
         if (basename.lastIndexOf(".") === -1) {
             return undefined;
@@ -174,7 +174,7 @@ export default class Router {
     getPathComponent(path = this.getPath()): PathComponent {
         // If already album path, return path
         if (path.endsWith("/")) {
-            return {album: path};
+            return { album: path };
         }
 
         const imageName = this.getImageName(path);

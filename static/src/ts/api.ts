@@ -1,6 +1,6 @@
-import {getCurrentAlbumPath} from "./routing";
-import {API_BASE_URL} from "./constants";
-import {DirectoryListing, DirectoryItem, DirectoryItemType} from "./types";
+import { getCurrentAlbumPath } from "./routing";
+import { API_BASE_URL } from "./constants";
+import { DirectoryListing, DirectoryItem, DirectoryItemType } from "../types";
 
 async function makeRequest(path: string): Promise<DirectoryListing> {
   const res = await fetch(API_BASE_URL + path);
@@ -24,6 +24,6 @@ export function getParentAlbum(): string {
   const path = getCurrentAlbumPath();
   const pathArr = path.split("/");
   pathArr.pop();
-  
+
   return pathArr.join("/");
 }

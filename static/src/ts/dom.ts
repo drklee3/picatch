@@ -1,4 +1,4 @@
-import {DirectoryListing, DirectoryItem, DirectoryItemType} from "./types";
+import { DirectoryListing, DirectoryItem, DirectoryItemType } from "../types";
 
 function parseImageDimensions(item: DirectoryItem): [number, number] {
     if (item.exif === null) {
