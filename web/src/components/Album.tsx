@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import { RouteComponentProps, useHistory } from "react-router-dom";
-import { fetchAlbumData } from "../util";
 import { DirectoryItem, ActiveFile } from "../types";
 import AlbumItem from "./AlbumItem";
 import ProgressBar from "./nprogress/ProgressBar";
 import usePathComponents from "../hooks/usePathComponents";
+import useAlbumApi from "../hooks/useAlbumApi";
+import activeFileReducer, {
+    ActiveFileActions,
+} from "../reducers/activeFileReducer";
 
 type AlbumProps = RouteComponentProps & {
     root?: boolean;
@@ -15,40 +18,19 @@ function Album(props: AlbumProps) {
     const history = useHistory();
 
     const path = usePathComponents();
+    // Also returns response but not really needed now
+    const { files, isLoading, error } = useAlbumApi(path);
 
-    // States
-    const [files, setFiles] = useState<DirectoryItem[]>([]);
-    // activeFile === ["fileName", file index]
-    const [activeFile, setActiveFile] = useState<ActiveFile>({
+    const [activeFileState, dispatch] = useReducer(activeFileReducer, {
         name: path.file || "",
-        index: -1, // file list doesn't exist yet buddy
+        index: -1,
     });
-    const [isLoading, setIsLoading] = useState(true);
-    const [isError, setIsError] = useState(false);
 
-    // Effects
+    // const browserUrl = useBrowserUrl(activeFileIndex, files)
 
-    // Only run this effect if album/file changes
-    useEffect(() => {
-        // Add function here to use async/await
-        const fetchData = async () => {
-            setIsLoading(true);
-            setIsError(false);
-            try {
-                // Fetch album data
-                const dirListing = await fetchAlbumData(path.album);
-                setFiles(dirListing.files);
-            } catch (e) {
-                console.error("Failed to fetch album data:", e);
-                setIsError(true);
-            }
-            setIsLoading(false);
-        };
+    /// States
 
-        // Get album data from api if new album
-        fetchData();
-    }, [path.album]);
-
+    /// Effects
     // Update page title on path change
     useEffect(() => {
         // Update the document title using the browser API
@@ -61,27 +43,31 @@ function Album(props: AlbumProps) {
 
         // Either on / or /album/
         if (props.root) {
-            newPath = "/" + activeFile.name;
+            newPath = "/" + activeFileState.name;
         } else {
-            newPath = "/album" + path.album + activeFile.name;
+            newPath = "/album" + path.album + activeFileState.name;
         }
 
         // Update ActiveFile index if directly linked
         if (
-            activeFile.name !== "" &&
-            activeFile.index === -1 &&
+            activeFileState.name !== "" &&
+            activeFileState.index === -1 &&
             files.length !== 0
         ) {
-            const i = files.findIndex((e) => e.name === activeFile.name);
-            setActiveFile({ name: activeFile.name, index: i });
+            const i = files.findIndex((e) => e.name === activeFileState.name);
+            console.log("updating index");
+            dispatch({
+                type: ActiveFileActions.SET_INDEX,
+                index: i,
+            });
         }
 
         // Only update path if new path
         if (history.location.pathname !== newPath) {
             history.push(newPath);
-            console.log("new activeFile:", activeFile);
+            console.log("new activeFile:", activeFileState);
         }
-    }, [activeFile, path.album, props.root, history, files]);
+    }, [activeFileState, path.album, props.root, history, files]);
 
     /*
     // Update current active file for browser back/forward buttons
@@ -101,13 +87,17 @@ function Album(props: AlbumProps) {
             <ProgressBar isAnimating={isLoading} />
             <pre>{JSON.stringify(path, null, 2)}</pre>
             <pre>{JSON.stringify(props, null, 2)}</pre>
-            {isError && <p>Failed to fetch images</p>}
+            {error && <p>Failed to fetch images</p>}
             <ul id="image-list">
                 {files.map((f, i) => (
                     <AlbumItem
                         pathComponents={path}
-                        activeFile={activeFile}
-                        setActiveFile={setActiveFile}
+                        active={
+                            activeFileState.index === i ||
+                            activeFileState.name === f.name
+                        }
+                        activeFileState={activeFileState}
+                        dispatch={dispatch}
                         index={i}
                         item={f}
                         key={f.name}

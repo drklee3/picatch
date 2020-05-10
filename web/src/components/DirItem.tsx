@@ -1,16 +1,8 @@
 import React from "react";
 import { useHistory } from "react-router";
-import { PathComponents, DirectoryItem, ActiveFile } from "../types";
+import { AlbumItemProps } from "./AlbumItem";
 
-type DirItemProps = {
-    pathComponents: PathComponents;
-    item: DirectoryItem;
-    index: number;
-    activeFile: ActiveFile;
-    setActiveFile: React.Dispatch<React.SetStateAction<ActiveFile>>;
-};
-
-function DirItem(props: DirItemProps) {
+function DirItem(props: AlbumItemProps) {
     const history = useHistory();
 
     // TODO: Fix this, redirects to / right after click

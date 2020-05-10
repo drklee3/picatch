@@ -1,55 +1,60 @@
 import React, { useEffect } from "react";
 import LazyLoad from "react-lazyload";
-import { PathComponents, DirectoryItem, ActiveFile } from "../types";
+import { AlbumItemProps } from "./AlbumItem";
 import { getPhotoUrl } from "../util";
-
-type ImageItemProps = {
-    pathComponents: PathComponents;
-    item: DirectoryItem;
-    index: number;
-    activeFile: ActiveFile;
-    setActiveFile: React.Dispatch<React.SetStateAction<ActiveFile>>;
-};
+import { ActiveFileActions } from "../reducers/activeFileReducer";
 
 function ImageItem({
+    active,
     pathComponents,
     item,
     index,
-    activeFile,
-    setActiveFile,
-}: ImageItemProps) {
+    dispatch,
+    activeFileState,
+}: AlbumItemProps) {
     const src = getPhotoUrl(pathComponents, item);
-    // Also check filename in case index isn't found yet
-    const isActive =
-        activeFile.index === index || activeFile.name === item.name;
 
+    /*
     useEffect(() => {
         // Hey I'm the current file but the index is wrong so let me update it
         // Seems kind of inefficient? Listening to each of these for every image, every update
         // Only needs to be run when an image is loaded directly the **first** time but this
         // runs every single time the active image is changed
-        if (activeFile.index === -1 && activeFile.name === item.name) {
-            setActiveFile({ name: item.name, index });
+        console.log("Checking index");
+        if (
+            activeFileState.index === -1 &&
+            activeFileState.name === item.name
+        ) {
+            dispatch({ type: ActiveFileActions.SET_INDEX, index });
             console.log("Updated missing index");
         }
-    }, [activeFile, index, item.name, setActiveFile]);
+    }, [activeFileState, index, dispatch, item.name]);
+    */
 
     function updateActiveFile() {
         // If already active, set to none
-        if (isActive) {
-            setActiveFile({ name: "", index: -1 });
+        if (active) {
+            dispatch({
+                type: ActiveFileActions.SET_FILE,
+                name: "",
+                index: -1,
+            });
             return;
         }
 
-        setActiveFile({ name: item.name, index });
+        dispatch({
+            type: ActiveFileActions.SET_FILE,
+            name: item.name,
+            index: index,
+        });
     }
 
     return (
         <li
-            className={`img-wrapper ${isActive ? "active" : ""}`}
-            onClick={() => updateActiveFile()}
+            className={`img-wrapper ${active ? "active" : ""}`}
+            onClick={updateActiveFile}
         >
-            {isActive && (
+            {active && (
                 <div className="img-fullscreen-wrapper">
                     <img src={src} alt={item.name} className="img-fullscreen" />
                 </div>
