@@ -2,9 +2,9 @@ import { API_BASE_URL } from "./constants";
 import { PathComponents, DirectoryListing, DirectoryItem } from "./types";
 
 export async function fetchAlbumData(
-    pathComp: PathComponents
+    pathAlbum: PathComponents["album"]
 ): Promise<DirectoryListing> {
-    const res = await fetch(API_BASE_URL + pathComp.album);
+    const res = await fetch(API_BASE_URL + pathAlbum);
     return res.json();
 }
 

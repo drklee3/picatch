@@ -16,9 +16,10 @@ function App() {
                         path="/album/:albumPath+"
                         render={(props) => <Album {...props} />}
                     ></Route>
-                    <Route path="/">
-                        <p>home</p>
-                    </Route>
+                    <Route
+                        path="/"
+                        render={(props) => <Album {...props} root={true} />}
+                    ></Route>
                 </Switch>
             </div>
         </Router>
