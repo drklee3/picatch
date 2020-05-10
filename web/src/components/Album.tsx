@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useReducer } from "react";
-import { RouteComponentProps, useHistory } from "react-router-dom";
-import { DirectoryItem, ActiveFile } from "../types";
+import React, { useEffect, useReducer } from "react";
+import { RouteComponentProps, useHistory } from "react-router";
 import AlbumItem from "./AlbumItem";
 import ProgressBar from "./nprogress/ProgressBar";
 import usePathComponents from "../hooks/usePathComponents";
@@ -26,8 +25,6 @@ function Album(props: AlbumProps) {
         index: -1,
     });
 
-    // const browserUrl = useBrowserUrl(activeFileIndex, files)
-
     /// States
 
     /// Effects
@@ -37,18 +34,8 @@ function Album(props: AlbumProps) {
         document.title = path.file || path.album || "hello";
     }, [path]);
 
-    // Update url whenever activeFile changes
+    // Update activeFile index on direct load
     useEffect(() => {
-        let newPath;
-
-        // Either on / or /album/
-        if (props.root) {
-            newPath = "/" + activeFileState.name;
-        } else {
-            newPath = "/album" + path.album + activeFileState.name;
-        }
-
-        // Update ActiveFile index if directly linked
         if (
             activeFileState.name !== "" &&
             activeFileState.index === -1 &&
@@ -61,13 +48,29 @@ function Album(props: AlbumProps) {
                 index: i,
             });
         }
+    }, [path.file, activeFileState, files]);
+
+    // Update url whenever activeFile or album changes
+    useEffect(() => {
+        let newPath;
+
+        // Either on / or /album/
+        if (props.root) {
+            newPath = "/" + activeFileState.name;
+        } else {
+            newPath = "/album" + path.album + activeFileState.name;
+        }
+
+        console.log(history.location.pathname, "vs", newPath);
+        console.log("activeFileState:", activeFileState);
+        console.log("path.album:", path.album);
 
         // Only update path if new path
         if (history.location.pathname !== newPath) {
             history.push(newPath);
-            console.log("new activeFile:", activeFileState);
+            console.log("new path:", newPath);
         }
-    }, [activeFileState, path.album, props.root, history, files]);
+    }, [activeFileState, path.album, props.root, history]);
 
     /*
     // Update current active file for browser back/forward buttons

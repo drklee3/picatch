@@ -8,6 +8,7 @@ function usePathComponents() {
 
     // Update path when location.pathname changes
     useEffect(() => {
+        console.log("usePathComponents updated: with path", location.pathname);
         setPath(getPathComponents(location.pathname));
     }, [location]);
 

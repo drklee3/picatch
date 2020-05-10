@@ -21,6 +21,7 @@ export interface DirectoryListing {
 }
 
 export interface PathComponents {
+    root?: string;
     album: string;
     file: string | null;
 }

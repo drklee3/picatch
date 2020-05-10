@@ -13,7 +13,7 @@ function DirItem(props: AlbumItemProps) {
             newAlbumPath = "/album" + newAlbumPath;
         }
 
-        console.log("newAlbumPath:", newAlbumPath);
+        console.log("navigating to new album:", newAlbumPath);
         history.push(newAlbumPath);
     }
 
