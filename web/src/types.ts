@@ -24,3 +24,8 @@ export interface PathComponents {
     album: string;
     file: string | null;
 }
+
+export interface ActiveFile {
+    name: string;
+    index: number;
+}

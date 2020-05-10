@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { RouteComponentProps, useHistory } from "react-router-dom";
 import { fetchAlbumData } from "../util";
-import { DirectoryItem } from "../types";
+import { DirectoryItem, ActiveFile } from "../types";
 import AlbumItem from "./AlbumItem";
 import ProgressBar from "./nprogress/ProgressBar";
 import usePathComponents from "../hooks/usePathComponents";
@@ -19,11 +19,12 @@ function Album(props: AlbumProps) {
     // States
     const [files, setFiles] = useState<DirectoryItem[]>([]);
     // activeFile === ["fileName", file index]
-    const [activeFile, setActiveFile] = useState<[string, number]>([
-        path.file || "",
-        -1, // file list doesn't exist yet buddy
-    ]);
+    const [activeFile, setActiveFile] = useState<ActiveFile>({
+        name: path.file || "",
+        index: -1, // file list doesn't exist yet buddy
+    });
     const [isLoading, setIsLoading] = useState(true);
+    const [isError, setIsError] = useState(false);
 
     // Effects
 
@@ -32,12 +33,14 @@ function Album(props: AlbumProps) {
         // Add function here to use async/await
         const fetchData = async () => {
             setIsLoading(true);
+            setIsError(false);
             try {
                 // Fetch album data
                 const dirListing = await fetchAlbumData(path.album);
                 setFiles(dirListing.files);
             } catch (e) {
                 console.error("Failed to fetch album data:", e);
+                setIsError(true);
             }
             setIsLoading(false);
         };
@@ -58,9 +61,21 @@ function Album(props: AlbumProps) {
 
         // Either on / or /album/
         if (props.root) {
-            newPath = "/" + activeFile[0];
+            newPath = "/" + activeFile.name;
         } else {
-            newPath = "/album" + path.album + activeFile[0];
+            newPath = "/album" + path.album + activeFile.name;
+        }
+
+        if (
+            activeFile.name !== "" &&
+            activeFile.index === -1 &&
+            files.length !== 0
+        ) {
+            console.log(files);
+            const i = files.findIndex((e) => e.name === activeFile.name);
+            console.log("No index for activefile: ", activeFile);
+            setActiveFile({ name: activeFile.name, index: i });
+            console.log("Updated activefile with: ", i, activeFile);
         }
 
         // Only update path if new path
@@ -68,7 +83,7 @@ function Album(props: AlbumProps) {
             history.push(newPath);
             console.log("new activeFile:", activeFile);
         }
-    }, [activeFile, path.album, props.root, history]);
+    }, [activeFile, path.album, props.root, history, files]);
 
     /*
     // Update current active file for browser back/forward buttons
@@ -88,6 +103,7 @@ function Album(props: AlbumProps) {
             <ProgressBar isAnimating={isLoading} />
             <pre>{JSON.stringify(path, null, 2)}</pre>
             <pre>{JSON.stringify(props, null, 2)}</pre>
+            {isError && <p>Failed to fetch images</p>}
             <ul id="image-list">
                 {files.map((f, i) => (
                     <AlbumItem
