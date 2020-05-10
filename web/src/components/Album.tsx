@@ -66,16 +66,14 @@ function Album(props: AlbumProps) {
             newPath = "/album" + path.album + activeFile.name;
         }
 
+        // Update ActiveFile index if directly linked
         if (
             activeFile.name !== "" &&
             activeFile.index === -1 &&
             files.length !== 0
         ) {
-            console.log(files);
             const i = files.findIndex((e) => e.name === activeFile.name);
-            console.log("No index for activefile: ", activeFile);
             setActiveFile({ name: activeFile.name, index: i });
-            console.log("Updated activefile with: ", i, activeFile);
         }
 
         // Only update path if new path
