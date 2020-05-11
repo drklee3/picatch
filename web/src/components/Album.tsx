@@ -59,6 +59,7 @@ function Album(props: AlbumProps) {
 
         // pic -> album: Path doesn't have file, but there is an activeFile
         if (path.file === null && activeFileState.name !== "") {
+            console.log("pic -> album");
             dispatch({
                 type: ActiveFileActions.SET_FILE,
                 name: "",
@@ -68,6 +69,7 @@ function Album(props: AlbumProps) {
 
         // album -> pic: Path has file, but there is no activeFile
         if (path.file !== null && activeFileState.name === "") {
+            console.log("album -> pic");
             // Read from history state first
             let index = history.location.state?.index;
 
@@ -84,8 +86,23 @@ function Album(props: AlbumProps) {
         }
 
         // pic -> pic: Path has file, but activeFile is different
-        if (path.file !== activeFileState.name) {
-            console.log(history.location.state);
+        if (
+            path.file !== null &&
+            activeFileState.name !== "" &&
+            path.file !== activeFileState.name
+        ) {
+            console.log("pic -> pic", path.file, activeFileState.name);
+            let index = history.location.state?.index;
+
+            if (index === undefined) {
+                index = files.findIndex((e) => e.name === activeFileState.name);
+            }
+
+            dispatch({
+                type: ActiveFileActions.SET_FILE,
+                name: path.file || "",
+                index,
+            });
         }
     }, [path.file, activeFileState, history, files]);
 

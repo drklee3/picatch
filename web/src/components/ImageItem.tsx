@@ -24,6 +24,10 @@ function ImageItem({
             pathComponents.file !== item.name &&
             history.action !== "POP"
         ) {
+            console.log(
+                "push:",
+                pathComponents.root + pathComponents.album + item.name
+            );
             history.push(
                 pathComponents.root + pathComponents.album + item.name,
                 { index }
@@ -34,6 +38,7 @@ function ImageItem({
     function updateActiveFile() {
         // If already active, set to none
         if (active) {
+            console.log("push:", pathComponents.root + pathComponents.album);
             history.push(pathComponents.root + pathComponents.album);
             dispatch({
                 type: ActiveFileActions.SET_FILE,
@@ -43,6 +48,10 @@ function ImageItem({
             return;
         }
 
+        console.log(
+            "push:",
+            pathComponents.root + pathComponents.album + item.name
+        );
         history.push(pathComponents.root + pathComponents.album + item.name);
         dispatch({
             type: ActiveFileActions.SET_FILE,
