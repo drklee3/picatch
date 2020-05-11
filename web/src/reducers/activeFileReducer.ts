@@ -12,9 +12,24 @@ function activeFileReducer(
 ): ActiveFileState {
     switch (action.type) {
         case ActiveFileActions.INCREMENT_INDEX:
-            return { ...state, index: state.index + 1 };
+            // Only increment if state isn't -1
+            if (state.index === -1) {
+                return state;
+            }
+
+            return {
+                ...state,
+                index: state.index + 1,
+            };
         case ActiveFileActions.DECREMENT_INDEX:
-            return { ...state, index: Math.max(state.index - 1, 0) };
+            // Only decrement if state isn't -1 or 0 (<= 0)
+            if (state.index <= 0) {
+                return state;
+            }
+            return {
+                ...state,
+                index: state.index - 1,
+            };
         case ActiveFileActions.SET_FILE:
             return { ...state, name: action.name, index: action.index };
         case ActiveFileActions.SET_NAME:
