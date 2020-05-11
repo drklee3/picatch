@@ -4,7 +4,7 @@ import { useHistory } from "react-router";
 import { AlbumItemProps } from "./AlbumItem";
 import { getPhotoUrl } from "../util";
 import { HistoryState } from "../types";
-import { ActiveFileActions } from "../reducers/activeFileReducer";
+import { ActiveFileActions } from "../reducers/activeFileActions";
 
 function ImageItem({
     active,

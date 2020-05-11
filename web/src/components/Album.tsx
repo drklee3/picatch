@@ -6,9 +6,8 @@ import { HistoryState } from "../types";
 import usePathComponents from "../hooks/usePathComponents";
 import useAlbumApi from "../hooks/useAlbumApi";
 import useKeyboardNavigation from "../hooks/useKeyboardNavigation";
-import activeFileReducer, {
-    ActiveFileActions,
-} from "../reducers/activeFileReducer";
+import activeFileReducer from "../reducers/activeFileReducer";
+import { ActiveFileActions } from "../reducers/activeFileActions";
 
 type AlbumProps = RouteComponentProps & {
     root?: boolean;
