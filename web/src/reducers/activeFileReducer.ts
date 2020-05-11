@@ -50,7 +50,7 @@ function activeFileReducer(
         case ActiveFileActions.INCREMENT_INDEX:
             return { ...state, index: state.index + 1 };
         case ActiveFileActions.DECREMENT_INDEX:
-            return { ...state, index: state.index - 1 };
+            return { ...state, index: Math.max(state.index - 1, 0) };
         case ActiveFileActions.SET_FILE:
             return { name: action.name, index: action.index };
         case ActiveFileActions.SET_NAME:
