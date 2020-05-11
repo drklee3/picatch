@@ -1,6 +1,7 @@
 import { ActiveFileActions, ActiveFileActionTypes } from "./activeFileActions";
 
 export type ActiveFileState = {
+    album: string;
     name: string;
     index: number;
 };
@@ -15,9 +16,11 @@ function activeFileReducer(
         case ActiveFileActions.DECREMENT_INDEX:
             return { ...state, index: Math.max(state.index - 1, 0) };
         case ActiveFileActions.SET_FILE:
-            return { name: action.name, index: action.index };
+            return { ...state, name: action.name, index: action.index };
         case ActiveFileActions.SET_NAME:
             return { ...state, name: action.name };
+        case ActiveFileActions.SET_ALBUM:
+            return { ...state, album: action.album };
         case ActiveFileActions.SET_INDEX:
             return { ...state, index: action.index };
         default:

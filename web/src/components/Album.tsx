@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useState, useReducer } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
 import AlbumItem from "./AlbumItem";
 import ProgressBar from "./nprogress/ProgressBar";
@@ -16,10 +16,13 @@ type AlbumProps = RouteComponentProps & {
 function Album(props: AlbumProps) {
     const history = useHistory<HistoryState>();
     const path = usePathComponents();
+
+    const [isDirectLink, setIsDirectLink] = useState(path.file !== null);
+
     // Also returns response but not really needed now
     const { files, isLoading, error } = useAlbumApi(path);
-
     const [activeFileState, dispatch] = useReducer(activeFileReducer, {
+        album: path.album,
         name: path.file || "",
         index: -1,
     });
@@ -35,77 +38,45 @@ function Album(props: AlbumProps) {
 
     // Update activeFile index on direct load
     useEffect(() => {
-        if (
-            activeFileState.name !== "" &&
-            activeFileState.index === -1 &&
-            files.length !== 0
-        ) {
+        if (!isDirectLink) {
+            return;
+        }
+
+        // Only if files loaded
+        if (files.length === 0) {
+            return;
+        }
+
+        // Index can come from history state also on refresh, so this won't
+        // necessarily run each time
+        if (path.file !== null && activeFileState.index === -1) {
             const i = files.findIndex((e) => e.name === activeFileState.name);
-            console.log("updating index");
+
             dispatch({
                 type: ActiveFileActions.SET_INDEX,
                 index: i,
             });
         }
-    }, [path.file, activeFileState, files]);
+
+        // Set to false after running once, even if above dispatch didn't run
+        setIsDirectLink(false);
+    }, [isDirectLink, path.file, activeFileState, files]);
 
     // Update current active file for browser back/forward buttons
     useEffect(() => {
-        // Update active file, possibly between picture/album or between picture/picture
         if (history.action !== "POP") {
             return;
         }
 
-        // pic -> album: Path doesn't have file, but there is an activeFile
-        if (path.file === null && activeFileState.name !== "") {
-            console.log("pic -> album");
-            dispatch({
-                type: ActiveFileActions.SET_FILE,
-                name: "",
-                index: -1,
-            });
-        }
+        const index = history.location.state?.index;
 
-        // album -> pic: Path has file, but there is no activeFile
-        if (path.file !== null && activeFileState.name === "") {
-            console.log("album -> pic");
-            // Read from history state first
-            let index = history.location.state?.index;
+        dispatch({
+            type: ActiveFileActions.SET_INDEX,
+            index: index || -1,
+        });
+    }, [history.location, history.action]);
 
-            // Somehow missing index from state?  Look in files list
-            if (index === undefined) {
-                index = files.findIndex((e) => e.name === activeFileState.name);
-            }
-
-            dispatch({
-                type: ActiveFileActions.SET_FILE,
-                name: path.file,
-                index,
-            });
-        }
-
-        // pic -> pic: Path has file, but activeFile is different
-        if (
-            path.file !== null &&
-            activeFileState.name !== "" &&
-            path.file !== activeFileState.name
-        ) {
-            console.log("pic -> pic", path.file, activeFileState.name);
-            let index = history.location.state?.index;
-
-            if (index === undefined) {
-                index = files.findIndex((e) => e.name === activeFileState.name);
-            }
-
-            dispatch({
-                type: ActiveFileActions.SET_FILE,
-                name: path.file || "",
-                index,
-            });
-        }
-    }, [path.file, activeFileState, history, files]);
-
-    // arrow nav
+    // Arrow nav
     useEffect(() => {
         if (keyPressed === "ArrowRight") {
             dispatch({
@@ -121,12 +92,50 @@ function Album(props: AlbumProps) {
 
         if (keyPressed === "Escape") {
             dispatch({
-                type: ActiveFileActions.SET_FILE,
-                name: "",
+                type: ActiveFileActions.SET_INDEX,
                 index: -1,
             });
         }
     }, [keyPressed]);
+
+    // Update browser url when album/active file state changes
+    useEffect(() => {
+        // Skip updating url if directly loading an image
+        if (isDirectLink) {
+            return;
+        }
+
+        if (files.length === 0) {
+            return;
+        }
+
+        // Build url
+        let fileName = "";
+
+        if (
+            activeFileState.index !== -1 &&
+            activeFileState.index < files.length
+        ) {
+            fileName = files[activeFileState.index].name;
+        }
+
+        let newPath = activeFileState.album + fileName;
+
+        // Prepend /album if not on root
+        if (
+            activeFileState.album.length > 1 &&
+            !newPath.startsWith("/album/")
+        ) {
+            newPath = "/album" + newPath;
+        }
+
+        if (history.location.pathname !== newPath) {
+            console.log(
+                `history.push(${newPath},  { index: ${activeFileState.index} })`
+            );
+            history.push(newPath, { index: activeFileState.index });
+        }
+    }, [isDirectLink, activeFileState, files, history]);
 
     return (
         <div>

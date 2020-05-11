@@ -31,6 +31,8 @@ export interface ActiveFile {
     index: number;
 }
 
-export interface HistoryState {
+export type HistoryState = HistoryStateValues | undefined;
+
+export interface HistoryStateValues {
     index: number;
 }

@@ -1,9 +1,7 @@
 import React, { useEffect } from "react";
 import LazyLoad from "react-lazyload";
-import { useHistory } from "react-router";
 import { AlbumItemProps } from "./AlbumItem";
 import { getPhotoUrl } from "../util";
-import { HistoryState } from "../types";
 import { ActiveFileActions } from "../reducers/activeFileActions";
 
 function ImageItem({
@@ -14,9 +12,9 @@ function ImageItem({
     dispatch,
     activeFileState,
 }: AlbumItemProps) {
-    const history = useHistory<HistoryState>();
     const src = getPhotoUrl(pathComponents, item);
 
+    /*
     useEffect(() => {
         // File is active but doesn't match url
         if (
@@ -34,12 +32,13 @@ function ImageItem({
             );
         }
     }, [history, active, pathComponents, item.name, index]);
+    */
 
     function updateActiveFile() {
         // If already active, set to none
         if (active) {
-            console.log("push:", pathComponents.root + pathComponents.album);
-            history.push(pathComponents.root + pathComponents.album);
+            // console.log("push:", pathComponents.root + pathComponents.album);
+            // history.push(pathComponents.root + pathComponents.album);
             dispatch({
                 type: ActiveFileActions.SET_FILE,
                 name: "",
@@ -48,11 +47,11 @@ function ImageItem({
             return;
         }
 
-        console.log(
-            "push:",
-            pathComponents.root + pathComponents.album + item.name
-        );
-        history.push(pathComponents.root + pathComponents.album + item.name);
+        // console.log(
+        //     "push:",
+        //     pathComponents.root + pathComponents.album + item.name
+        // );
+        // history.push(pathComponents.root + pathComponents.album + item.name);
         dispatch({
             type: ActiveFileActions.SET_FILE,
             name: item.name,

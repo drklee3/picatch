@@ -2,10 +2,8 @@ import React from "react";
 import ImageItem from "./ImageItem";
 import DirItem from "./DirItem";
 import { PathComponents, DirectoryItem, DirectoryItemType } from "../types";
-import {
-    ActiveFileActionTypes,
-    ActiveFileState,
-} from "../reducers/activeFileReducer";
+import { ActiveFileState } from "../reducers/activeFileReducer";
+import { ActiveFileActionTypes } from "../reducers/activeFileActions";
 
 export type AlbumItemProps = {
     active: boolean;

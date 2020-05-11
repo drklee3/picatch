@@ -1,28 +1,26 @@
 import React from "react";
-import { useHistory } from "react-router";
+import { ActiveFileActions } from "../reducers/activeFileActions";
 import { AlbumItemProps } from "./AlbumItem";
 
-function DirItem(props: AlbumItemProps) {
-    const history = useHistory();
-
+function DirItem({ pathComponents, item, dispatch }: AlbumItemProps) {
     // TODO: Fix this, redirects to / right after click
     function goToAlbum() {
-        let newAlbumPath = props.pathComponents.album + props.item.name;
+        let newAlbumPath = pathComponents.album + item.name;
 
         if (newAlbumPath.length > 0 && !newAlbumPath.startsWith("/album/")) {
             newAlbumPath = "/album" + newAlbumPath;
         }
 
-        console.log("navigating to new album:", newAlbumPath);
-        history.push(newAlbumPath);
+        dispatch({
+            type: ActiveFileActions.SET_ALBUM,
+            album: newAlbumPath,
+        });
     }
 
     return (
         <li className={`img-wrapper`}>
-            <p>{props.pathComponents.album + props.item.name}</p>
-            <button onClick={() => goToAlbum()}>
-                Album: {props.item.name}
-            </button>
+            <p>{pathComponents.album + item.name}</p>
+            <button onClick={() => goToAlbum()}>Album: {item.name}</button>
         </li>
     );
 }
