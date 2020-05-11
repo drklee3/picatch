@@ -21,12 +21,16 @@ export interface DirectoryListing {
 }
 
 export interface PathComponents {
-    root?: string;
+    root: string;
     album: string;
     file: string | null;
 }
 
 export interface ActiveFile {
     name: string;
+    index: number;
+}
+
+export interface HistoryState {
     index: number;
 }

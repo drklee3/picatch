@@ -3,19 +3,20 @@ import { useState, useEffect } from "react";
 function useKeypress(targetKey: string) {
     const [keyPressed, setKeyPressed] = useState(false);
 
-    function downHandler({ key }: KeyboardEvent) {
-        if (key === targetKey) {
-            setKeyPressed(true);
-        }
-    }
-
-    const upHandler = ({ key }: KeyboardEvent) => {
-        if (key === targetKey) {
-            setKeyPressed(false);
-        }
-    };
-
     useEffect(() => {
+        console.log("adding event listner");
+        const downHandler = ({ key }: KeyboardEvent) => {
+            if (key === targetKey) {
+                setKeyPressed(true);
+            }
+        };
+
+        const upHandler = ({ key }: KeyboardEvent) => {
+            if (key === targetKey) {
+                setKeyPressed(false);
+            }
+        };
+
         window.addEventListener("keydown", downHandler);
         window.addEventListener("keyup", upHandler);
 
@@ -23,9 +24,9 @@ function useKeypress(targetKey: string) {
             window.removeEventListener("keydown", downHandler);
             window.removeEventListener("keyup", upHandler);
         };
-    });
+    }, [targetKey]);
 
-    return keyPressed;
+    return { keyPressed, targetKey };
 }
 
 export default useKeypress;

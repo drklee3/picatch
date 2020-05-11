@@ -2,8 +2,10 @@ import React, { useEffect, useReducer } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
 import AlbumItem from "./AlbumItem";
 import ProgressBar from "./nprogress/ProgressBar";
+import { HistoryState } from "../types";
 import usePathComponents from "../hooks/usePathComponents";
 import useAlbumApi from "../hooks/useAlbumApi";
+import useKeyboardNavigation from "../hooks/useKeyboardNavigation";
 import activeFileReducer, {
     ActiveFileActions,
 } from "../reducers/activeFileReducer";
@@ -13,9 +15,7 @@ type AlbumProps = RouteComponentProps & {
 };
 
 function Album(props: AlbumProps) {
-    // React router hooks
-    const history = useHistory();
-
+    const history = useHistory<HistoryState>();
     const path = usePathComponents();
     // Also returns response but not really needed now
     const { files, isLoading, error } = useAlbumApi(path);
@@ -25,7 +25,7 @@ function Album(props: AlbumProps) {
         index: -1,
     });
 
-    /// States
+    const keyPressed = useKeyboardNavigation();
 
     /// Effects
     // Update page title on path change
@@ -50,40 +50,67 @@ function Album(props: AlbumProps) {
         }
     }, [path.file, activeFileState, files]);
 
-    // Update url whenever activeFile or album changes
-    useEffect(() => {
-        let newPath;
-
-        // Either on / or /album/
-        if (props.root) {
-            newPath = "/" + activeFileState.name;
-        } else {
-            newPath = "/album" + path.album + activeFileState.name;
-        }
-
-        console.log(history.location.pathname, "vs", newPath);
-        console.log("activeFileState:", activeFileState);
-        console.log("path.album:", path.album);
-
-        // Only update path if new path
-        if (history.location.pathname !== newPath) {
-            history.push(newPath);
-            console.log("new path:", newPath);
-        }
-    }, [activeFileState, path.album, props.root, history]);
-
-    /*
     // Update current active file for browser back/forward buttons
     useEffect(() => {
         // Update active file, possibly between picture/album or between picture/picture
-        setActiveFile([
-            path.file || "",
-            path.file ? files.findIndex((e) => e.name === path.file) : -1,
-        ]);
+        if (history.action !== "POP") {
+            return;
+        }
 
-        console.log("Recovered activefile from history:", path.file);
-    }, [path.file, files]);
-    */
+        // pic -> album: Path doesn't have file, but there is an activeFile
+        if (path.file === null && activeFileState.name !== "") {
+            dispatch({
+                type: ActiveFileActions.SET_FILE,
+                name: "",
+                index: -1,
+            });
+        }
+
+        // album -> pic: Path has file, but there is no activeFile
+        if (path.file !== null && activeFileState.name === "") {
+            // Read from history state first
+            let index = history.location.state?.index;
+
+            // Somehow missing index from state?  Look in files list
+            if (index === undefined) {
+                index = files.findIndex((e) => e.name === activeFileState.name);
+            }
+
+            dispatch({
+                type: ActiveFileActions.SET_FILE,
+                name: path.file,
+                index,
+            });
+        }
+
+        // pic -> pic: Path has file, but activeFile is different
+        if (path.file !== activeFileState.name) {
+            console.log(history.location.state);
+        }
+    }, [path.file, activeFileState, history, files]);
+
+    // arrow nav
+    useEffect(() => {
+        if (keyPressed === "ArrowRight") {
+            dispatch({
+                type: ActiveFileActions.INCREMENT_INDEX,
+            });
+        }
+
+        if (keyPressed === "ArrowLeft") {
+            dispatch({
+                type: ActiveFileActions.DECREMENT_INDEX,
+            });
+        }
+
+        if (keyPressed === "Escape") {
+            dispatch({
+                type: ActiveFileActions.SET_FILE,
+                name: "",
+                index: -1,
+            });
+        }
+    }, [keyPressed]);
 
     return (
         <div>
@@ -95,10 +122,7 @@ function Album(props: AlbumProps) {
                 {files.map((f, i) => (
                     <AlbumItem
                         pathComponents={path}
-                        active={
-                            activeFileState.index === i ||
-                            activeFileState.name === f.name
-                        }
+                        active={activeFileState.index === i}
                         activeFileState={activeFileState}
                         dispatch={dispatch}
                         index={i}
