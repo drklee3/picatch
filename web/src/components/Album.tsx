@@ -23,6 +23,7 @@ function Album(props: AlbumProps) {
     const { files, isLoading, error } = useAlbumApi(path);
     const [activeFileState, dispatch] = useReducer(activeFileReducer, {
         album: path.album,
+        albumSize: -1,
         name: path.file || "",
         index: -1,
     });
@@ -35,6 +36,15 @@ function Album(props: AlbumProps) {
         // Update the document title using the browser API
         document.title = path.file || path.album || "hello";
     }, [path]);
+
+    useEffect(() => {
+        if (files.length !== 0) {
+            dispatch({
+                type: ActiveFileActions.SET_ALBUM_SIZE,
+                albumSize: files.length,
+            });
+        }
+    }, [files]);
 
     // Update activeFile index on direct load
     useEffect(() => {

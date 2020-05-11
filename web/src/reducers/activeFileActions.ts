@@ -3,6 +3,7 @@ export enum ActiveFileActions {
     SET_NAME = "SET_NAME",
     SET_INDEX = "SET_INDEX",
     SET_ALBUM = "SET_ALBUM",
+    SET_ALBUM_SIZE = "SET_ALBUM_SIZE",
     INCREMENT_INDEX = "INCREMENT_INDEX",
     DECREMENT_INDEX = "DECREMENT_INDEX",
 }
@@ -28,6 +29,11 @@ export interface SetAlbumAction {
     album: string;
 }
 
+export interface SetAlbumSizeAction {
+    type: ActiveFileActions.SET_ALBUM_SIZE;
+    albumSize: number;
+}
+
 export interface IncrementIndexAction {
     type: ActiveFileActions.INCREMENT_INDEX;
 }
@@ -41,5 +47,6 @@ export type ActiveFileActionTypes =
     | SetNameAction
     | SetIndexAction
     | SetAlbumAction
+    | SetAlbumSizeAction
     | IncrementIndexAction
     | DecrementIndexAction;
