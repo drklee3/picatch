@@ -13,8 +13,6 @@ Docker images are provided via GitHub Packages.  Binary downloads coming soon.
 First [authenticate with GitHub Packages] by creating a personal access token
 with at least the `read:packages` scope.
 
-After you've logged into Docker,
-
 To run picatch with `docker run`:
 
 ```bash
