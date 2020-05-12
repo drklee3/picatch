@@ -77,8 +77,9 @@ cargo run --release
 ## Configuration
 
 When running the binary directly, you can specify which directories files are
-served from via environment variables.  If you are running picatch via docker,
-you should be setting the photos directory with a bind mount as shown above.
+served from along with the interface and port via environment variables.  If you
+are running picatch via Docker, you should set the photos directory with a bind
+mount as shown above.
 
 | Environment Variable | Default value |
 | -------------------- | ------------- |
