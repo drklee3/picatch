@@ -1,0 +1,9 @@
+Dockerfile
+photos
+
+**/target
+
+**/.git
+**/.github
+**/.gitignore
+**/node_modules
