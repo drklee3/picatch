@@ -35,15 +35,15 @@ services:
       - /path/to/your/photos:/photos
 ```
 
-# Compiling from source
+## Compiling from source
 
-## Requirements
+### Requirements
 
-### Backend
+#### Backend
 
 * Rust version 1.39+ (for async/await)
 
-### Frontend
+#### Frontend
 
 * Node.js
 * Yarn
