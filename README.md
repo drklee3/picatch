@@ -10,7 +10,12 @@ Minimal photo gallery based on directory structure without a database.
 
 Docker images are provided via GitHub Packages.  Binary downloads coming soon.
 
-To run picatch with docker:
+First [authenticate with GitHub Packages] by creating a personal access token
+with at least the `read:packages` scope.
+
+After you've logged into Docker,
+
+To run picatch with `docker run`:
 
 ```bash
 docker run \
@@ -19,7 +24,7 @@ docker run \
     docker.pkg.github.com/drklee3/picatch/picatch:latest
 ```
 
-Alternatively with docker-compose:
+Alternatively with `docker-compose`:
 
 ```yml
 version: '3'
@@ -105,3 +110,5 @@ you should be setting the photos directory with a bind mount as shown above.
   * [ ] Home
   * [ ] Albums
   * [ ] Images
+
+[authenticate with GitHub Packages]: https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-docker-for-use-with-github-packages#authenticating-to-github-packages
