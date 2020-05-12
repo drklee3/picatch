@@ -8,15 +8,18 @@ use actix_identity::{CookieIdentityPolicy, IdentityService};
 use actix_web::{middleware, web, App, HttpServer, HttpRequest, HttpResponse};
 use actix_web::dev::ServiceResponse;
 use dotenv;
-use dphoto_lib::*;
-use std::path::Path;
-use error::Result;
-use std::result::Result as StdResult;
-use std::io::{self, BufReader};
-use std::collections::BTreeMap;
-use std::fs::File;
-use serde::Serialize;
 use image::image_dimensions;
+use lazy_static::lazy_static;
+use serde::Serialize;
+use std::collections::BTreeMap;
+use std::env;
+use std::fs::File;
+use std::io::{self, BufReader};
+use std::path::Path;
+use std::result::Result as StdResult;
+
+use dphoto_lib::*;
+use error::Result;
 
 #[derive(Debug, Serialize)]
 struct ImageDimensions {
@@ -68,6 +71,11 @@ fn get_image_dimensions(path: &Path) -> Option<ImageDimensions> {
         width: x.0,
         height: x.1,
     })
+}
+
+lazy_static! {
+    static ref PHOTOS_DIR: String = env::var("PHOTOS_DIR").unwrap_or("./photos".to_string());
+    static ref PUBLIC_DIR: String = env::var("PUBLIC_DIR").unwrap_or("./web/build".to_string());
 }
 
 fn render_dir(dir: &fs::Directory, req: &HttpRequest
@@ -124,7 +132,7 @@ fn render_dir(dir: &fs::Directory, req: &HttpRequest
 }
 
 async fn index(req: HttpRequest) -> Result<fs::NamedFile> {
-    Ok(fs::NamedFile::open("./static/public/index.html")?)
+    Ok(fs::NamedFile::open(format!("{}/index.html", *PUBLIC_DIR))?)
 }
 
 #[actix_rt::main]
@@ -150,13 +158,13 @@ async fn main() -> Result<()> {
             ))
             // enable logger - register logger last!
             .wrap(middleware::Logger::default())
-            .service(fs::Files::new("/photos", "./photos/")
+            .service(fs::Files::new("/photos", PHOTOS_DIR.clone())
                 .files_listing_renderer(render_dir)
                 .show_files_listing()
             )
             .service(
                 // TODO: Keep static files in memory?
-                fs::Files::new("/", "./static/public")
+                fs::Files::new("/", PUBLIC_DIR.clone())
                     .index_file("index.html")
             )
             .default_service(
