@@ -74,8 +74,8 @@ fn get_image_dimensions(path: &Path) -> Option<ImageDimensions> {
 }
 
 lazy_static! {
-    static ref PHOTOS_DIR: String = env::var("PHOTOS_DIR").unwrap_or("./photos".to_string());
-    static ref PUBLIC_DIR: String = env::var("PUBLIC_DIR").unwrap_or("./web/build".to_string());
+    static ref PHOTOS_DIR: String = env::var("DPHOTO_PHOTOS_DIR").unwrap_or("./photos".to_string());
+    static ref PUBLIC_DIR: String = env::var("DPHOTO_PUBLIC_DIR").unwrap_or("./web/build".to_string());
 }
 
 fn render_dir(dir: &fs::Directory, req: &HttpRequest
@@ -140,6 +140,9 @@ async fn main() -> Result<()> {
     dotenv::dotenv().ok();
     utils::logging::setup_logger()?;
 
+    let interface = env::var("DPHOTO_INTERFACE").unwrap_or("0.0.0.0".to_string());
+    let port = env::var("DPHOTO_PORT").unwrap_or("8080".to_string());
+
     HttpServer::new(move || {
         App::new()
             .data(web::JsonConfig::default().limit(4096))
@@ -173,7 +176,7 @@ async fn main() -> Result<()> {
             )
 
     })
-    .bind("127.0.0.1:8080")?
+    .bind(format!("{}:{}", interface, port))?
     .run()
     .await
     .map_err(Into::into)
