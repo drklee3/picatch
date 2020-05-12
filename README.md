@@ -1,10 +1,49 @@
 # picatch
 
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/drklee3/picatch/Docker?style=flat-square)
+
 Minimal photo gallery based on directory structure without a database.
+
+(pic + catch)
+
+## Running
+
+Docker images are provided via GitHub Packages.  Binary downloads coming soon.
+
+To run picatch with docker:
+
+```bash
+docker run \
+    -p 8080:8080 \
+    -v /path/to/your/photos:/photos \
+    docker.pkg.github.com/drklee3/picatch/picatch:latest
+```
+
+Alternatively with docker-compose:
+
+```yml
+version: '3'
+services:
+  picatch:
+    image: docker.pkg.github.com/drklee3/picatch/picatch:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - /path/to/your/photos:/photos
+```
+
+# Compiling from source
 
 ## Requirements
 
+### Backend
+
 * Rust version 1.39+ (for async/await)
+
+### Frontend
+
+* Node.js
+* Yarn
 
 ## Building
 
@@ -13,15 +52,17 @@ Minimal photo gallery based on directory structure without a database.
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # Clone this repository
-git clone git@github.com:drklee3/picatch.git
-
-# Or clone with HTTPS
 git clone https://github.com/drklee3/picatch.git
 
 cd picatch
 
 # Build for release
 cargo build --release
+
+cd web
+
+# Build frontend files
+yarn && yarn build
 ```
 
 ## Running
@@ -29,6 +70,20 @@ cargo build --release
 ```bash
 cargo run --release
 ```
+
+## Configuration
+
+When running the binary directly, you can specify which directories files are
+served from via environment variables.  If you are running picatch via docker,
+you should be setting the photos directory with a bind mount as shown above.
+
+| Environment Variable | Default value |
+| -------------------- | ------------- |
+| `PICATCH_PHOTOS_DIR` | `./photos`    |
+| `PICATCH_PUBLIC_DIR` | `./web/build` |
+| `PICATCH_INTERFACE`  | `0.0.0.0`     |
+| `PICATCH_PORT`       | `8080`        |
+
 
 ## backend
 
