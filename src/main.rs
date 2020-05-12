@@ -3,8 +3,6 @@ extern crate log;
 
 use actix_cors::Cors;
 use actix_files as fs;
-use actix_http::cookie::SameSite;
-use actix_identity::{CookieIdentityPolicy, IdentityService};
 use actix_web::{middleware, web, App, HttpServer, HttpRequest, HttpResponse};
 use actix_web::dev::ServiceResponse;
 use dotenv;
@@ -18,7 +16,7 @@ use std::io::{self, BufReader};
 use std::path::Path;
 use std::result::Result as StdResult;
 
-use dphoto_lib::*;
+use picatch_lib::*;
 use error::Result;
 
 #[derive(Debug, Serialize)]
@@ -74,8 +72,8 @@ fn get_image_dimensions(path: &Path) -> Option<ImageDimensions> {
 }
 
 lazy_static! {
-    static ref PHOTOS_DIR: String = env::var("DPHOTO_PHOTOS_DIR").unwrap_or("./photos".to_string());
-    static ref PUBLIC_DIR: String = env::var("DPHOTO_PUBLIC_DIR").unwrap_or("./web/build".to_string());
+    static ref PHOTOS_DIR: String = env::var("PICATCH_PHOTOS_DIR").unwrap_or("./photos".to_string());
+    static ref PUBLIC_DIR: String = env::var("PICATCH_PUBLIC_DIR").unwrap_or("./web/build".to_string());
 }
 
 fn render_dir(dir: &fs::Directory, req: &HttpRequest
@@ -87,7 +85,7 @@ fn render_dir(dir: &fs::Directory, req: &HttpRequest
         if dir.is_visible(&entry) {
             let entry = entry.unwrap();
 
-            let p = match entry.path().strip_prefix(&dir.path) {
+            let _p = match entry.path().strip_prefix(&dir.path) {
                 Ok(p) if cfg!(windows) => base.join(p).to_string_lossy().replace("\\", "/"),
                 Ok(p) => base.join(p).to_string_lossy().into_owned(),
                 Err(_) => continue,
@@ -131,7 +129,7 @@ fn render_dir(dir: &fs::Directory, req: &HttpRequest
     ))
 }
 
-async fn index(req: HttpRequest) -> Result<fs::NamedFile> {
+async fn index(_req: HttpRequest) -> Result<fs::NamedFile> {
     Ok(fs::NamedFile::open(format!("{}/index.html", *PUBLIC_DIR))?)
 }
 
@@ -140,8 +138,8 @@ async fn main() -> Result<()> {
     dotenv::dotenv().ok();
     utils::logging::setup_logger()?;
 
-    let interface = env::var("DPHOTO_INTERFACE").unwrap_or("0.0.0.0".to_string());
-    let port = env::var("DPHOTO_PORT").unwrap_or("8080".to_string());
+    let interface = env::var("PICATCH_INTERFACE").unwrap_or("0.0.0.0".to_string());
+    let port = env::var("PICATCH_PORT").unwrap_or("8080".to_string());
 
     HttpServer::new(move || {
         App::new()
@@ -152,13 +150,6 @@ async fn main() -> Result<()> {
                   .allowed_methods(vec!["GET", "POST"])
                   .max_age(3600)
                   .finish())
-            .wrap(IdentityService::new(
-                // TODO: Update secret key with an actual secret key
-                CookieIdentityPolicy::new(&[0; 32])
-                    .name("dphoto-auth")
-                    .secure(false)
-                    .same_site(SameSite::Strict),
-            ))
             // enable logger - register logger last!
             .wrap(middleware::Logger::default())
             .service(fs::Files::new("/photos", PHOTOS_DIR.clone())

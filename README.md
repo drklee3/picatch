@@ -1,6 +1,4 @@
-# dphoto
-
-uhh wip + need a new name 🤔
+# picatch
 
 Minimal photo gallery based on directory structure without a database.
 
@@ -15,12 +13,12 @@ Minimal photo gallery based on directory structure without a database.
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # Clone this repository
-git clone git@github.com:drklee3/dphoto.git
+git clone git@github.com:drklee3/picatch.git
 
 # Or clone with HTTPS
-git clone https://github.com/drklee3/dphoto.git
+git clone https://github.com/drklee3/picatch.git
 
-cd dphoto
+cd picatch
 
 # Build for release
 cargo build --release

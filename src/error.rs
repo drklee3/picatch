@@ -3,7 +3,6 @@ use fern::InitError as FernError;
 use image::ImageError;
 use log::SetLoggerError;
 use serde::{Deserialize, Serialize};
-use std::error::Error as StdError;
 use std::fmt::Error as FmtError;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::io::Error as IoError;
@@ -103,24 +102,6 @@ impl Display for Error {
             Error::InternalServerError => write!(f, "Internal Server Error"),
             Error::BadRequest(ref inner) => write!(f, "BadRequest: {}", inner),
             Error::Unauthorized => write!(f, "Unauthorized"),
-        }
-    }
-}
-
-impl StdError for Error {
-    fn description(&self) -> &str {
-        match *self {
-            Error::Fern(ref inner) => inner.description(),
-            Error::Fmt(ref inner) => inner.description(),
-            Error::Image(ref inner) => inner.description(),
-            Error::SetLogger(ref inner) => inner.description(),
-            Error::Io(ref inner) => inner.description(),
-            Error::TomlDe(ref inner) => inner.description(),
-            Error::TomlSe(ref inner) => inner.description(),
-            Error::BadRequest(ref inner) => inner,
-            Error::InternalServerError => "Internal Server Error",
-            Error::Unauthorized => "Unauthorized",
-            _ => "uhh",
         }
     }
 }

@@ -1,15 +1,15 @@
 [package]
-name = "dphoto"
+name = "picatch"
 version = "0.1.0"
 authors = ["drklee3 <derrick@dlee.dev>"]
 edition = "2018"
 
 [lib]
-name = "dphoto_lib"
+name = "picatch_lib"
 path = "src/lib.rs"
 
 [[bin]]
-name = "dphoto_bin"
+name = "picatch_bin"
 path = "src/main.rs"
 
 [dependencies]

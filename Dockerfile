@@ -2,8 +2,8 @@
 FROM rust:1.43 as back
 
 # create a new empty shell project
-RUN USER=root cargo new --bin dphoto_source
-WORKDIR /dphoto_source
+RUN USER=root cargo new --bin picatch_source
+WORKDIR /picatch_source
 
 # since both lib and bin provided in Cargo.toml, need to create lib.rs to build
 RUN touch ./src/lib.rs
@@ -19,8 +19,8 @@ RUN rm src/*.rs
 # copy source tree
 COPY ./src ./src
 
-# build for release, remove dummy compiled files **including libdphoto**
-RUN rm ./target/release/deps/*dphoto*
+# build for release, remove dummy compiled files **including libpicatch**
+RUN rm ./target/release/deps/*picatch*
 RUN cargo build --release
 
 
@@ -39,14 +39,14 @@ RUN yarn build
 
 ## Final base image
 FROM debian:buster-slim
-COPY --from=back /dphoto_source/target/release/dphoto_bin /dphoto
+COPY --from=back /picatch_source/target/release/picatch_bin /picatch
 COPY --from=front /web/build /public
 
 # Default dirs
-ENV DPHOTO_PHOTOS_DIR="/photos"
-ENV DPHOTO_PUBLIC_DIR="/public"
+ENV PICATCH_PHOTOS_DIR="/photos"
+ENV PICATCH_PUBLIC_DIR="/public"
 
 # Dir for external photos
 RUN mkdir -p /photos
 EXPOSE 8080
-ENTRYPOINT ["/dphoto"]
+ENTRYPOINT ["/picatch"]
