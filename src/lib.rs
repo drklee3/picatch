@@ -3,5 +3,7 @@
 extern crate log;
 
 pub mod error;
+pub mod model;
 pub mod resizer;
+pub mod routes;
 pub mod utils;

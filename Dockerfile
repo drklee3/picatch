@@ -1,3 +1,16 @@
+## Build react files
+FROM node:14.2 as front
+RUN mkdir -p /web
+WORKDIR /web
+
+# cache dependencies
+COPY ./web/package.json ./web/yarn.lock ./
+RUN yarn
+
+# copy source
+COPY ./web/ ./
+RUN yarn build
+
 ## Compile actix-web server
 FROM rust:1.43 as back
 
@@ -19,32 +32,20 @@ RUN rm src/*.rs
 # copy source tree
 COPY ./src ./src
 
+# copy built static react files
+RUN mkdir -p ./web/build
+COPY --from=front /web/build ./web/build
+
 # build for release, remove dummy compiled files **including libpicatch**
 RUN rm ./target/release/deps/*picatch*
 RUN cargo build --release
 
-
-## Build react files
-FROM node:14.2 as front
-RUN mkdir -p /web
-WORKDIR /web
-
-# cache dependencies
-COPY ./web/package.json ./web/yarn.lock ./
-RUN yarn
-
-# copy source
-COPY ./web/ ./
-RUN yarn build
-
 ## Final base image
 FROM debian:buster-slim
 COPY --from=back /picatch_source/target/release/picatch_bin /picatch
-COPY --from=front /web/build /public
 
 # Default dirs
 ENV PICATCH_PHOTOS_DIR="/photos"
-ENV PICATCH_PUBLIC_DIR="/public"
 
 # Dir for external photos
 RUN mkdir -p /photos

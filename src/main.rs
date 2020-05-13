@@ -1,10 +1,7 @@
-#[macro_use]
-extern crate log;
-
 use actix_cors::Cors;
 use actix_files as fs;
-use actix_web::{middleware, web, App, HttpServer, HttpRequest, HttpResponse};
 use actix_web::dev::ServiceResponse;
+use actix_web::{middleware, web, App, HttpRequest, HttpResponse, HttpServer};
 use dotenv;
 use image::image_dimensions;
 use lazy_static::lazy_static;
@@ -16,8 +13,7 @@ use std::io::{self, BufReader};
 use std::path::Path;
 use std::result::Result as StdResult;
 
-use picatch_lib::*;
-use error::Result;
+use picatch_lib::{error::Result, routes, utils};
 
 #[derive(Debug, Serialize)]
 struct ImageDimensions {
@@ -72,12 +68,13 @@ fn get_image_dimensions(path: &Path) -> Option<ImageDimensions> {
 }
 
 lazy_static! {
-    static ref PHOTOS_DIR: String = env::var("PICATCH_PHOTOS_DIR").unwrap_or("./photos".to_string());
-    static ref PUBLIC_DIR: String = env::var("PICATCH_PUBLIC_DIR").unwrap_or("./web/build".to_string());
+    static ref PHOTOS_DIR: String =
+        env::var("PICATCH_PHOTOS_DIR").unwrap_or("./photos".to_string());
+    static ref PUBLIC_DIR: String =
+        env::var("PICATCH_PUBLIC_DIR").unwrap_or("./web/build".to_string());
 }
 
-fn render_dir(dir: &fs::Directory, req: &HttpRequest
-) -> StdResult<ServiceResponse, io::Error> {
+fn render_dir(dir: &fs::Directory, req: &HttpRequest) -> StdResult<ServiceResponse, io::Error> {
     let base = Path::new(req.path());
     let mut files = Vec::new();
 
@@ -120,17 +117,11 @@ fn render_dir(dir: &fs::Directory, req: &HttpRequest
 
     Ok(ServiceResponse::new(
         req.clone(),
-        HttpResponse::Ok().json(
-            DirectoryListing {
-                current: dir.base.to_string_lossy().to_string(),
-                files,
-            }
-        )
+        HttpResponse::Ok().json(DirectoryListing {
+            current: dir.base.to_string_lossy().to_string(),
+            files,
+        }),
     ))
-}
-
-async fn index(_req: HttpRequest) -> Result<fs::NamedFile> {
-    Ok(fs::NamedFile::open(format!("{}/index.html", *PUBLIC_DIR))?)
 }
 
 #[actix_rt::main]
@@ -146,26 +137,20 @@ async fn main() -> Result<()> {
             .data(web::JsonConfig::default().limit(4096))
             .wrap(
                 Cors::new()
-                  .send_wildcard()
-                  .allowed_methods(vec!["GET", "POST"])
-                  .max_age(3600)
-                  .finish())
+                    .send_wildcard()
+                    .allowed_methods(vec!["GET", "POST"])
+                    .max_age(3600)
+                    .finish(),
+            )
+            .wrap(middleware::Compress::default())
             // enable logger - register logger last!
             .wrap(middleware::Logger::default())
-            .service(fs::Files::new("/photos", PHOTOS_DIR.clone())
-                .files_listing_renderer(render_dir)
-                .show_files_listing()
-            )
             .service(
-                // TODO: Keep static files in memory?
-                fs::Files::new("/", PUBLIC_DIR.clone())
-                    .index_file("index.html")
+                fs::Files::new("/photos", PHOTOS_DIR.clone())
+                    .files_listing_renderer(render_dir)
+                    .show_files_listing(),
             )
-            .default_service(
-                web::resource("")
-                    .route(web::get().to(index))
-            )
-
+            .service(web::resource("/{path:.*}").route(web::get().to(routes::static_files::path)))
     })
     .bind(format!("{}:{}", interface, port))?
     .run()

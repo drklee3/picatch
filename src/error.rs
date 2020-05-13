@@ -34,6 +34,7 @@ pub enum Error {
     Unauthorized,
     BadRequest(String),
     InternalServerError,
+    NotFound,
 }
 impl From<FernError> for Error {
     fn from(err: FernError) -> Error {
@@ -102,6 +103,7 @@ impl Display for Error {
             Error::InternalServerError => write!(f, "Internal Server Error"),
             Error::BadRequest(ref inner) => write!(f, "BadRequest: {}", inner),
             Error::Unauthorized => write!(f, "Unauthorized"),
+            Error::NotFound => write!(f, "NotFound"),
         }
     }
 }
@@ -131,6 +133,7 @@ impl ResponseError for Error {
                 status: "Unauthorized".into(),
                 message: "Unauthorized".into(),
             }),
+            Error::NotFound => HttpResponse::NotFound().body("404 Not Found"),
             _ => HttpResponse::InternalServerError().finish(),
         }
     }

@@ -18,7 +18,7 @@ Docker images are provided via GitHub Packages.  Binary downloads coming soon.
 First [authenticate with GitHub Packages] by creating a personal access token
 with at least the `read:packages` scope.
 
-To run picatch with `docker run`:
+To run picatch with `docker run`
 
 ```bash
 docker run \
@@ -27,7 +27,7 @@ docker run \
     docker.pkg.github.com/drklee3/picatch/picatch:latest
 ```
 
-Alternatively with `docker-compose`:
+Alternatively with `docker-compose`
 
 ```yml
 version: '3'
@@ -55,6 +55,17 @@ services:
 
 ## Building
 
+### Frontend
+
+```
+cd web
+
+# Build frontend files
+yarn && yarn build
+```
+
+### Backend
+
 ```bash
 # Install Rust -- https://www.rust-lang.org/tools/install
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -66,17 +77,16 @@ cd picatch
 
 # Build for release
 cargo build --release
-
-cd web
-
-# Build frontend files
-yarn && yarn build
 ```
+
+When compiling with the release profile, static files are embedded in the binary.
+This means you need to build the frontend files **before** compiling picatch so
+the files are correctly embedded.
 
 ## Running
 
 ```bash
-cargo run --release
+./target/release/picatch_bin
 ```
 
 ## Configuration
@@ -89,7 +99,6 @@ mount as shown above.
 | Environment Variable | Default value |
 | -------------------- | ------------- |
 | `PICATCH_PHOTOS_DIR` | `./photos`    |
-| `PICATCH_PUBLIC_DIR` | `./web/build` |
 | `PICATCH_INTERFACE`  | `0.0.0.0`     |
 | `PICATCH_PORT`       | `8080`        |
 

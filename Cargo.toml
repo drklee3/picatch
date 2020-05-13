@@ -13,19 +13,21 @@ name = "picatch_bin"
 path = "src/main.rs"
 
 [dependencies]
+actix-cors = "0.2.0"
 actix-files = "0.2.1"
 actix-http = "1.0.1"
 actix-identity = "0.2.1"
 actix-rt = "1.0.0"
 actix-web = "2.0.0"
-actix-cors = "0.2.0"
 dotenv = "0.15.0"
 futures = "0.3.1"
 image = "0.22.3"
 kamadak-exif = "0.5.1"
 lazy_static = "1.4.0"
 log = "0.4.8"
+mime_guess = "2.0.3"
 rand = "0.7.2"
+rust-embed="5.5.1"
 serde = "1.0.103"
 serde_derive = "1.0.103"
 toml = "0.5.5"
@@ -37,3 +39,8 @@ features = ["serde"]
 [dependencies.fern]
 version = "0.5.9"
 features = ["colored"]
+
+[features]
+default = []
+
+use-fs-for-static = []
