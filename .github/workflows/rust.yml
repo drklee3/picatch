@@ -1,19 +1,20 @@
-name: Rust
+name: CI
 
 on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: sudo apt-get install -y libpq-dev
-    - name: Create empty config
-      run: touch config.toml
-    - name: Build
+    - name: Install Node.js dependencies
+      working-directory: ./web
+      run: yarn
+    - name: Create React production build
+      working-directory: ./web
+      run: yarn build
+
+    - name: Build picatch
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
