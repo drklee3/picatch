@@ -2,6 +2,8 @@
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/drklee3/picatch/Docker?style=flat-square)
 
+![picatch logo](./logo.png)
+
 Minimal photo gallery based on directory structure without a database.
 
 (pic + catch)
@@ -87,7 +89,6 @@ mount as shown above.
 | `PICATCH_PUBLIC_DIR` | `./web/build` |
 | `PICATCH_INTERFACE`  | `0.0.0.0`     |
 | `PICATCH_PORT`       | `8080`        |
-
 
 ## backend
 
