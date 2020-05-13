@@ -6,7 +6,10 @@
 
 Minimal photo gallery based on directory structure without a database.
 
-(pic + catch)
+<details>
+  <summary>(picatch: pic + catch)</summary>
+  Why catch? It... catches pictures in a folder? uhh I don't really know
+</details>
 
 ## Running
 
