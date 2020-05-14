@@ -3,7 +3,7 @@ name: CI
 on: [push]
 
 jobs:
-  build:
+  frontend:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -14,7 +14,55 @@ jobs:
       working-directory: ./web
       run: yarn build
 
+    - name: Set outputs
+      id: vars
+      run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+    - name: Tar artifacts
+      run: tar czf picatch-${{ steps.vars.outputs.sha_short }}-frontend.tar.gz ./web/build/*
+    - name: Upload frontend artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: picatch-${{ steps.vars.outputs.sha_short }}-frontend.tar.gz
+        path: ./picatch-${{ steps.vars.outputs.sha_short }}-frontend.tar.gz
+
+  build:
+    needs: frontend
+    strategy:
+      matrix:
+        toolchain:
+          - stable
+          - beta
+          - nightly
+          - 1.39.0  # MSRV
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set outputs
+      id: vars
+      run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+    - name: Download frontend artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: picatch-${{ steps.vars.outputs.sha_short }}-frontend.tar.gz
+    - name: Unpack frontend artifact
+      run: tar xzf picatch-${{ steps.vars.outputs.sha_short }}-frontend.tar.gz
+
+    - name: Select toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: ${{ matrix.rust }}
     - name: Build picatch
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --release
+
+    - name: Create tar file
+      if: matrix.rust == 'stable'
+      run: tar czf picatch-${{ steps.vars.outputs.sha_short }}-x86_64-unknown-linux-gnu.tar.gz ./ 
+    - name: Upload artifacts
+      if: matrix.rust == 'stable'
+      uses: actions/upload-artifact@v1
+      with:
+        name: homework
+        path: math-homework.txt
