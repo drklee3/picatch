@@ -46,7 +46,7 @@ services:
 
 #### Backend
 
-* Rust version 1.39+ (for async/await)
+* Rust version 1.40.0+
 
 #### Frontend
 
