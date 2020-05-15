@@ -5,7 +5,6 @@ use actix_web::{middleware, web, App, HttpRequest, HttpResponse, HttpServer};
 use dotenv;
 use image::image_dimensions;
 use lazy_static::lazy_static;
-use serde::Serialize;
 use std::collections::BTreeMap;
 use std::env;
 use std::fs::File;
@@ -13,37 +12,11 @@ use std::io::{self, BufReader};
 use std::path::Path;
 use std::result::Result as StdResult;
 
-use picatch_lib::{error::Result, routes, utils};
-
-#[derive(Debug, Serialize)]
-struct ImageDimensions {
-    width: u32,
-    height: u32,
-}
-
-#[derive(Debug, Serialize)]
-enum DirectoryItemType {
-    Dir,
-    File,
-}
-
-#[derive(Debug, Serialize)]
-struct DirectoryItem {
-    r#type: DirectoryItemType,
-    name: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    exif: Option<BTreeMap<String, String>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    dimensions: Option<ImageDimensions>,
-}
-
-#[derive(Debug, Serialize)]
-struct DirectoryListing {
-    current: String,
-    files: Vec<DirectoryItem>,
-}
+use picatch_lib::{
+    error::Result,
+    model::directory::{DirectoryItem, DirectoryItemType, DirectoryListing, ImageDimensions},
+    routes, utils,
+};
 
 fn get_exif_data(path: &Path) -> Option<BTreeMap<String, String>> {
     let file = File::open(path).ok()?;
@@ -80,6 +53,10 @@ fn render_dir(dir: &fs::Directory, req: &HttpRequest) -> StdResult<ServiceRespon
 
     for entry in dir.path.read_dir()? {
         if dir.is_visible(&entry) {
+            if entry.is_err() {
+                continue;
+            }
+
             let entry = entry.unwrap();
 
             let _p = match entry.path().strip_prefix(&dir.path) {
@@ -114,6 +91,11 @@ fn render_dir(dir: &fs::Directory, req: &HttpRequest) -> StdResult<ServiceRespon
             }
         }
     }
+
+    // First sort by filename, doesn't need to be stable
+    files.sort_unstable_by(|a, b| a.name.cmp(&b.name));
+    // Second sort by dir/file, needs to be stable to preserve file order
+    files.sort_by(|a, b| a.r#type.cmp(&b.r#type));
 
     Ok(ServiceResponse::new(
         req.clone(),

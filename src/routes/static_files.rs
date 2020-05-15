@@ -1,6 +1,6 @@
 use actix_web::body::Body;
 use actix_web::{web, HttpRequest, HttpResponse};
-use mime_guess::{from_path, mime};
+use mime_guess::from_path;
 use std::borrow::Cow;
 
 use crate::error::{Error, Result};
@@ -53,7 +53,7 @@ async fn handle_embedded_file(path: web::Path<String>) -> Result<HttpResponse> {
     Ok(res.body(body))
 }
 
-pub async fn path(req: HttpRequest, path: web::Path<String>) -> Result<HttpResponse> {
+pub async fn path(_req: HttpRequest, path: web::Path<String>) -> Result<HttpResponse> {
     // let path = &req.path()[1..]; // trim the preceding `/` in path
     handle_embedded_file(path).await
 }
