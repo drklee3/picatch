@@ -8,6 +8,7 @@ function ImageItem(props: Props) {
     return (
         <img
             {...props}
+            alt={props.alt ? props.alt : "Image"}
             className={`${props.className || ""} ${loaded ? "visible" : ""}`}
             onLoad={() => setLoaded(true)}
         />
