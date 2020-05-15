@@ -1,6 +1,7 @@
 import React from "react";
 import LazyLoad from "react-lazyload";
 import { AlbumItemProps } from "./AlbumItem";
+import Image from "./Image";
 import { getPhotoUrl } from "../util";
 import { ActiveFileActions } from "../reducers/activeFileActions";
 
@@ -46,12 +47,12 @@ function ImageItem({
                 offset={100}
                 placeholder={<p>placeholder</p>}
             >
-                <img
+                <Image
                     src={src}
                     alt={item.name}
-                    className="img-thumbnail"
-                    // width={item.dimensions?.width}
-                    // height={item.dimensions?.height}
+                    className="img-thumbnail invisible"
+                    width={item.dimensions?.width}
+                    height={item.dimensions?.height}
                 />
             </LazyLoad>
         </li>

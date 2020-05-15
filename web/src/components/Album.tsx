@@ -150,8 +150,6 @@ function Album(props: AlbumProps) {
     return (
         <div>
             <ProgressBar isAnimating={isLoading} />
-            <pre>{JSON.stringify(path, null, 2)}</pre>
-            <pre>{JSON.stringify(props, null, 2)}</pre>
             {error && <p>Failed to fetch images</p>}
             <ul id="image-list">
                 {files.map((f, i) => (
