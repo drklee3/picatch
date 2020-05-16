@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "./constants";
+import { API_BASE_URL, IMAGE_BASE_URL } from "./constants";
 import { PathComponents, DirectoryListing, DirectoryItem } from "./types";
 
 export async function fetchAlbumData(
@@ -9,7 +9,7 @@ export async function fetchAlbumData(
 }
 
 export function getPhotoUrl(pathComp: PathComponents, item: DirectoryItem) {
-    return API_BASE_URL + pathComp.album + item.name;
+    return IMAGE_BASE_URL + pathComp.album + item.name;
 }
 
 export function imageIsActive(pathComp: PathComponents, item: DirectoryItem) {

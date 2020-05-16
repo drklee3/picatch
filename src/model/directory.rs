@@ -1,6 +1,6 @@
 use serde::Serialize;
-use std::collections::BTreeMap;
 use std::cmp::Ord;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Serialize)]
 pub struct ImageDimensions {
