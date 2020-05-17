@@ -50,6 +50,8 @@ function activeFileReducer(
             }
 
             return { ...state, albumSize: action.albumSize };
+        case ActiveFileActions.SET_ALBUM_AND_INDEX:
+            return { ...state, album: action.album, index: action.index };
         case ActiveFileActions.SET_INDEX:
             return { ...state, index: action.index };
         default:

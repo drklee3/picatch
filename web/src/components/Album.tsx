@@ -8,6 +8,7 @@ import useAlbumApi from "../hooks/useAlbumApi";
 import useKeyboardNavigation from "../hooks/useKeyboardNavigation";
 import activeFileReducer from "../reducers/activeFileReducer";
 import { ActiveFileActions } from "../reducers/activeFileActions";
+import { getPathComponents } from "../util";
 
 type AlbumProps = RouteComponentProps & {
     root?: boolean;
@@ -79,9 +80,11 @@ function Album(props: AlbumProps) {
         }
 
         const index = history.location.state?.index;
+        const { album } = getPathComponents(history.location.pathname);
 
         dispatch({
-            type: ActiveFileActions.SET_INDEX,
+            type: ActiveFileActions.SET_ALBUM_AND_INDEX,
+            album: album,
             index: index || -1,
         });
     }, [history.location, history.action]);
