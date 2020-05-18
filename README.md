@@ -154,6 +154,6 @@ the files are correctly embedded.
   - [ ] Images
 
 [actix-web]: https://github.com/actix/actix-web
-[gh-workflow-ci]: actions?query=workflow%3ACI
+[gh-workflow-ci]: https://github.com/drklee3/picatch/actions?query=workflow%3ACI
 [github-package-auth]: https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-docker-for-use-with-github-packages#authenticating-to-github-packages
 [image]: https://github.com/image-rs/image
