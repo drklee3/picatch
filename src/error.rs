@@ -1,4 +1,5 @@
 use actix_web::{error::BlockingError, HttpResponse, ResponseError};
+use config::ConfigError;
 use fern::InitError as FernError;
 use image::ImageError;
 use log::SetLoggerError;
@@ -16,6 +17,8 @@ pub type Result<T> = StdResult<T, Error>;
 /// Common error type to hold errors from other crates
 #[derive(Debug)]
 pub enum Error {
+    /// `config` error
+    Config(ConfigError),
     /// `fern` error
     Fern(FernError),
     /// `std::fmt` error
@@ -36,6 +39,13 @@ pub enum Error {
     InternalServerError,
     NotFound,
 }
+
+impl From<ConfigError> for Error {
+    fn from(err: ConfigError) -> Error {
+        Error::Config(err)
+    }
+}
+
 impl From<FernError> for Error {
     fn from(err: FernError) -> Error {
         Error::Fern(err)
@@ -93,6 +103,7 @@ impl From<BlockingError<Error>> for Error {
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         match *self {
+            Error::Config(ref inner) => inner.fmt(f),
             Error::Fern(ref inner) => inner.fmt(f),
             Error::Fmt(ref inner) => inner.fmt(f),
             Error::Image(ref inner) => inner.fmt(f),

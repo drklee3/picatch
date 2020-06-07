@@ -1,22 +1,20 @@
 use actix_cors::Cors;
 use actix_files;
 use actix_web::{middleware, web, App, HttpServer};
-use dotenv;
-use std::env;
 
-use picatch_lib::{constants::PHOTOS_DIR, error::Result, routes, utils};
+use picatch_lib::{error::Result, model::config::AppConfig, routes, utils};
 
 #[actix_rt::main]
 async fn main() -> Result<()> {
-    dotenv::dotenv().ok();
-    utils::logging::setup_logger()?;
+    let config = AppConfig::new()?;
+    let config_clone = config.clone();
 
-    let interface = env::var("PICATCH_INTERFACE").unwrap_or("0.0.0.0".to_string());
-    let port = env::var("PICATCH_PORT").unwrap_or("8080".to_string());
+    utils::logging::setup_logger()?;
 
     HttpServer::new(move || {
         App::new()
             .data(web::JsonConfig::default().limit(4096))
+            .data(config_clone.clone())
             .wrap(
                 Cors::new()
                     .send_wildcard()
@@ -33,10 +31,17 @@ async fn main() -> Result<()> {
                         .route(web::get().to(routes::directory_api::dir_listing)),
                 ),
             )
-            .service(actix_files::Files::new("/photos", PHOTOS_DIR.clone()))
+            .service(actix_files::Files::new(
+                "/photos/orig/",
+                &config_clone.original_photos_dir,
+            ))
+            .service(actix_files::Files::new(
+                "/photos/scaled/",
+                &config_clone.resized_photos_dir,
+            ))
             .service(web::resource("/{path:.*}").route(web::get().to(routes::static_files::path)))
     })
-    .bind(format!("{}:{}", interface, port))?
+    .bind(format!("{}:{}", &config.interface, &config.port))?
     .run()
     .await
     .map_err(Into::into)

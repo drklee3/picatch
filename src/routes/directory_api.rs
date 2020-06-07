@@ -6,9 +6,11 @@ use std::io::BufReader;
 use std::path::Path;
 
 use crate::{
-    constants::PHOTOS_DIR,
     error::Result,
-    model::directory::{DirectoryItem, DirectoryItemType, DirectoryListing, ImageDimensions},
+    model::{
+        config::AppConfig,
+        directory::{DirectoryItem, DirectoryItemType, DirectoryListing, ImageDimensions},
+    },
 };
 
 pub fn get_exif_data(path: &Path) -> Option<BTreeMap<String, String>> {
@@ -33,14 +35,18 @@ pub fn get_image_dimensions(path: &Path) -> Option<ImageDimensions> {
     })
 }
 
-pub async fn dir_listing(_req: HttpRequest, path: web::Path<String>) -> Result<HttpResponse> {
-    let listing = get_dir_listing(path.into_inner())?;
+pub async fn dir_listing(
+    _req: HttpRequest,
+    path: web::Path<String>,
+    config: web::Data<AppConfig>,
+) -> Result<HttpResponse> {
+    let listing = get_dir_listing(path.into_inner(), config.get_ref())?;
 
     Ok(HttpResponse::Ok().json(listing))
 }
 
-pub fn get_dir_listing(path: String) -> Result<DirectoryListing> {
-    let base = Path::new(&*PHOTOS_DIR);
+pub fn get_dir_listing(path: String, config: &AppConfig) -> Result<DirectoryListing> {
+    let base = Path::new(&*config.original_photos_dir);
 
     // replacement should end in "/" to remove the "/" at beginning of relative_path
     // If relative_path starts with "/", it will replace base.
