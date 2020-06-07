@@ -1,0 +1,15 @@
+original_photos_dir = "./photos/"
+resized_photos_dir = "./photos_resized/"
+interface = "0.0.0.0"
+port = 8080
+
+[public]
+site_name = "picatch"
+
+[[public.links]]
+text = "Instagram"
+url = "https://www.instagram.com/dlee.photo/"
+
+[[public.links]]
+text = "GitHub"
+url = "https://github.com/drklee3/"

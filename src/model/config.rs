@@ -1,15 +1,16 @@
 use crate::error::Result;
 use config;
 use serde::{Deserialize, Serialize};
+use std::cmp::Eq;
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(PartialEq, Eq, Clone, Debug, Deserialize, Serialize)]
 pub struct NavLink {
-    text: String,
-    url: String,
+    pub text: String,
+    pub url: String,
 }
 
 /// Config for sending data to frontend
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(PartialEq, Eq, Clone, Debug, Deserialize, Serialize)]
 pub struct PubConfig {
     #[serde(default = "default_site_name")]
     pub site_name: String,
@@ -21,7 +22,7 @@ pub struct PubConfig {
     pub version: String,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(PartialEq, Eq, Clone, Debug, Deserialize, Serialize)]
 pub struct AppConfig {
     pub public: PubConfig,
 
@@ -34,6 +35,7 @@ pub struct AppConfig {
     /// actix listening interface
     #[serde(default = "default_interface")]
     pub interface: String,
+
     /// actix listening port
     #[serde(default = "default_port")]
     pub port: u32,

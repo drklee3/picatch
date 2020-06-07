@@ -1,5 +1,4 @@
 use std::path::Path;
-use picatch_lib::error::Result;
 use picatch_lib::filesystem::startup::get_all_files;
 
 #[test]
