@@ -1,5 +1,5 @@
-original_photos_dir = "./photos/"
-resized_photos_dir = "./photos_resized/"
+original_photos_dir = "./photos"
+resized_photos_dir = "./photos_resized"
 interface = "0.0.0.0"
 port = 8080
 
@@ -7,8 +7,8 @@ port = 8080
 site_name = "picatch"
 
 [[public.links]]
-text = "Instagram"
-url = "https://www.instagram.com/dlee.photo/"
+text = "Picatch"
+url = "https://github.com/drklee3/picatch"
 
 [[public.links]]
 text = "GitHub"

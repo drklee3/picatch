@@ -4,6 +4,7 @@ extern crate log;
 use actix_cors::Cors;
 use actix_files;
 use actix_web::{middleware, web, App, HttpServer};
+use dotenv;
 use std::process;
 
 use picatch_lib::{
@@ -27,6 +28,7 @@ async fn main() {
 }
 
 async fn run() -> Result<()> {
+    dotenv::dotenv().ok();
     utils::logging::setup_logger()?;
     let config = AppConfig::new()?;
     debug!("Loaded config: {:#?}", config);

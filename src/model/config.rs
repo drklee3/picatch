@@ -84,11 +84,11 @@ fn default_version() -> String {
 }
 
 fn default_original_photos_dir() -> String {
-    "./photos/".into()
+    "./photos".into()
 }
 
 fn default_resized_photos_dir() -> String {
-    "./photos_resized/".into()
+    "./photos_resized".into()
 }
 
 fn default_interface() -> String {

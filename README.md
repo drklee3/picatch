@@ -25,6 +25,7 @@ Minimal photo gallery based on directory structure without a database. Utilizes
   - [Environment Variables](#environment-variables)
     - [Application Options](#application-options)
     - [Public Options](#public-options)
+    - [Example](#example)
 - [Compiling from source](#compiling-from-source)
   - [Requirements](#requirements)
     - [Backend](#backend)
@@ -125,21 +126,26 @@ url = "https://github.com/drklee3/"
 
 ### Environment Variables
 
+**Note:** Environment variables can also be set in an `.env` file. However, it
+should be easier to set configuration options via a toml file as shown above.
+Environment variables should be used for a smaller number of options or to
+override the config file.
+
 Log level can only be set from the `PICATCH_lOG` environment variable as shown
 below.
 
-| Environment Variable | Default Value | Available options                                                   |
-| -------------------- | ------------- | ------------------------------------------------------------------- |
-| `PICATCH_LOG`        | `INFO`        | `OFF`, `ERROR`, `WARN`, `INFO`, `DEBUG`, `TRACE` (case insensitive) |
+| Environment Variable | Default Value | Available options                                                       |
+| -------------------- | ------------- | ----------------------------------------------------------------------- |
+| `PICATCH_LOG`        | `INFO`        | `OFF`, `ERROR`, `WARN`, `INFO`, `DEBUG`, `TRACE`<br/>(case insensitive) |
 
 #### Application Options
 
-| Environment Variable         | Default Value       |
-| ---------------------------- | ------------------- |
-| `PICATCH_PHOTOS_DIR`         | `./photos`          |
-| `PICATCH_RESIZED_PHOTOS_DIR` | `./photos_resized/` |
-| `PICATCH_INTERFACE`          | `0.0.0.0`           |
-| `PICATCH_PORT`               | `8080`              |
+| Environment Variable          | Default Value      |
+| ----------------------------- | ------------------ |
+| `PICATCH_ORIGINAL_PHOTOS_DIR` | `./photos`         |
+| `PICATCH_RESIZED_PHOTOS_DIR`  | `./photos_resized` |
+| `PICATCH_INTERFACE`           | `0.0.0.0`          |
+| `PICATCH_PORT`                | `8080`             |
 
 #### Public Options
 
@@ -155,11 +161,14 @@ as the site name and displayed links.
 Since there can be multiple links, `PICATCH_PUBLIC.LINKS` can be treated as an
 array. Replace `i` with the corresponding link index.
 
-Example usage shown below. This provides the _same_ results as the example toml
-configuration file shown [above](#config-file).
+#### Example
+
+Example usage of environment variables shown below. This provides the _same_
+results as the example toml configuration file shown [above](#config-file).
 
 ```bash
-env PICATCH_LOG=debug \
+env PICATCH_ORIGINAL_PHOTOS_DIR=./photos \
+    PICATCH_RESIZED_PHOTOS_DIR=./photos_resized \
     PICATCH_PUBLIC.LINKS[0].TEXT=Picatch \
     PICATCH_PUBLIC.LINKS[0].URL=https://github.com/drklee3/picatch \
     PICATCH_PUBLIC.LINKS[1].TEXT=GitHub \
