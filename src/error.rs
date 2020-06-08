@@ -17,6 +17,7 @@ pub type Result<T> = StdResult<T, Error>;
 /// Common error type to hold errors from other crates
 #[derive(Debug)]
 pub enum Error {
+    Picatch(String),
     /// `config` error
     Config(ConfigError),
     /// `fern` error
@@ -103,6 +104,7 @@ impl From<BlockingError<Error>> for Error {
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         match *self {
+            Error::Picatch(ref inner) => inner.fmt(f),
             Error::Config(ref inner) => inner.fmt(f),
             Error::Fern(ref inner) => inner.fmt(f),
             Error::Fmt(ref inner) => inner.fmt(f),

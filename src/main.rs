@@ -1,15 +1,35 @@
+#[macro_use]
+extern crate log;
+
 use actix_cors::Cors;
 use actix_files;
 use actix_web::{middleware, web, App, HttpServer};
+use std::process;
 
-use picatch_lib::{error::Result, model::config::AppConfig, routes, utils};
+use picatch_lib::{
+    error::Result, filesystem::startup::verify_directories_exist, model::config::AppConfig, routes,
+    utils,
+};
 
 #[actix_rt::main]
-async fn main() -> Result<()> {
-    let config = AppConfig::new()?;
-    let config_clone = config.clone();
+async fn main() {
+    // Wrap run fn so we can catch all errors and print them properly
+    match run().await {
+        Ok(_) => process::exit(0),
+        Err(err) => {
+            error!("{}", err);
+            process::exit(1);
+        }
+    }
+}
 
-    utils::logging::setup_logger()?;
+async fn run() -> Result<()> {
+    let config = AppConfig::new()?;
+
+    utils::logging::setup_logger(&config)?;
+    verify_directories_exist(&config)?;
+
+    let config_clone = config.clone();
 
     HttpServer::new(move || {
         App::new()

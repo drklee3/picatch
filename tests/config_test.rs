@@ -17,7 +17,7 @@ fn it_parses_config_from_file() {
                     url: "https://github.com/drklee3/".into(),
                 },
             ],
-            version: env!("CARGO_PKG_VERSION").into()
+            version: env!("CARGO_PKG_VERSION").into(),
         },
         original_photos_dir: "./photos/".into(),
         resized_photos_dir: "./photos_resized/".into(),

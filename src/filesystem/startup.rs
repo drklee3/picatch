@@ -1,6 +1,41 @@
+use crate::{
+    error::{Error, Result},
+    model::config::AppConfig,
+};
+use std::fs::{self, create_dir_all, DirEntry};
 use std::path::Path;
-use std::fs::{self, DirEntry};
-use crate::error::Result;
+
+pub fn verify_directories_exist(config: &AppConfig) -> Result<()> {
+    dir_exists_or_create(Path::new(&config.original_photos_dir))?;
+    dir_exists_or_create(Path::new(&config.resized_photos_dir))?;
+
+    Ok(())
+}
+
+fn dir_exists_or_create(path: &Path) -> Result<()> {
+    if path.exists() && path.is_dir() {
+        return Ok(());
+    }
+
+    // Exit if file exists with dir name since we don't want to modify existing files
+    // This doesn't work if there is a trailing slash though. Will error later on `create_dir_all`
+    if path.is_file() {
+        return Err(Error::Picatch(format!(
+            "File exists, but isn't a directory: {}",
+            path.to_string_lossy()
+        )));
+    }
+
+    if !path.exists() {
+        info!(
+            "Directory {} doesn't exist, creating...",
+            path.to_string_lossy()
+        );
+        create_dir_all(path)?;
+    }
+
+    Ok(())
+}
 
 pub fn get_all_files(path: &Path) -> Result<Vec<DirEntry>> {
     let mut files = list_files_recursive(path)?;

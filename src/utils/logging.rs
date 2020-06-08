@@ -1,14 +1,16 @@
-use crate::error::Result;
 use chrono;
 use fern;
 use fern::colors::{Color, ColoredLevelConfig};
 use std::sync::mpsc::channel;
 use std::thread;
 
-pub fn setup_logger() -> Result<()> {
+use crate::{error::Result, model::config::AppConfig};
+
+pub fn setup_logger(config: &AppConfig) -> Result<()> {
     let (tx, rx) = channel();
 
     thread::spawn(move || {
+        // Does this even help I don't know
         while let Ok(msg) = rx.recv() {
             handle_log_message(msg);
         }
@@ -29,7 +31,7 @@ pub fn setup_logger() -> Result<()> {
                 message
             ))
         })
-        .level(log::LevelFilter::Debug)
+        .level(config.log)
         // senders are async and won't block the main thread
         .chain(tx)
         .apply()?;

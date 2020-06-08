@@ -1,5 +1,5 @@
-use std::path::Path;
 use picatch_lib::filesystem::startup::get_all_files;
+use std::path::Path;
 
 #[test]
 fn it_lists_all_files() {
