@@ -1,10 +1,9 @@
 use crate::error::Result;
-use config::{self, ConfigError};
+use config;
 use serde::{Deserialize, Serialize};
 use std::cmp::Eq;
 use std::default::Default;
 use std::env;
-use log::LevelFilter;
 
 #[derive(PartialEq, Eq, Clone, Debug, Deserialize, Serialize)]
 pub struct NavLink {
@@ -53,10 +52,6 @@ pub struct AppConfig {
     /// actix listening port
     #[serde(default = "default_port")]
     pub port: u32,
-
-    /// Log level
-    #[serde(default = "default_log")]
-    pub log: LevelFilter,
 }
 
 impl AppConfig {
@@ -65,17 +60,8 @@ impl AppConfig {
 
         let config_file_path = env::var("PICATCH_CONFIG").unwrap_or("picatch".into());
 
-        // Add in `./picatch.toml`
-        if let Err(e) = conf.merge(config::File::with_name(&config_file_path).required(false)) {
-            match e {
-                ConfigError::Foreign(e) => {
-                    warn!("Config error: {}", e);
-                },
-                _ => {
-                    return Err(e.into())
-                }
-            }
-        }
+        // Add in config file
+        conf.merge(config::File::with_name(&config_file_path).required(false))?;
 
         // Add in settings from the environment (with a prefix of PICATCH)
         // Eg.. `PICATCH_DEBUG=1 ./target/app` would set the `debug` key
@@ -111,8 +97,4 @@ fn default_interface() -> String {
 
 fn default_port() -> u32 {
     8080
-}
-
-fn default_log() -> LevelFilter {
-    LevelFilter::Info
 }

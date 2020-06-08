@@ -15,7 +15,10 @@ use picatch_lib::{
 async fn main() {
     // Wrap run fn so we can catch all errors and print them properly
     match run().await {
-        Ok(_) => process::exit(0),
+        Ok(_) => {
+            println!("bye bye");
+            process::exit(0)
+        }
         Err(err) => {
             error!("{}", err);
             process::exit(1);
@@ -24,9 +27,10 @@ async fn main() {
 }
 
 async fn run() -> Result<()> {
+    utils::logging::setup_logger()?;
     let config = AppConfig::new()?;
+    debug!("Loaded config: {:#?}", config);
 
-    utils::logging::setup_logger(&config)?;
     verify_directories_exist(&config)?;
 
     let config_clone = config.clone();

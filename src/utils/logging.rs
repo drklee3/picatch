@@ -1,16 +1,17 @@
+use crate::error::Result;
 use chrono;
 use fern;
 use fern::colors::{Color, ColoredLevelConfig};
+use log::LevelFilter;
+use std::env;
+use std::str::FromStr;
 use std::sync::mpsc::channel;
 use std::thread;
 
-use crate::{error::Result, model::config::AppConfig};
-
-pub fn setup_logger(config: &AppConfig) -> Result<()> {
+pub fn setup_logger() -> Result<()> {
     let (tx, rx) = channel();
 
     thread::spawn(move || {
-        // Does this even help I don't know
         while let Ok(msg) = rx.recv() {
             handle_log_message(msg);
         }
@@ -20,6 +21,10 @@ pub fn setup_logger(config: &AppConfig) -> Result<()> {
         .info(Color::BrightGreen)
         .debug(Color::BrightCyan)
         .trace(Color::BrightMagenta);
+
+    let log_level =
+        LevelFilter::from_str(&env::var("PICATCH_LOG").unwrap_or("INFO".to_string()))
+            .unwrap_or(LevelFilter::Info);
 
     fern::Dispatch::new()
         .format(move |out, message, record| {
@@ -31,10 +36,12 @@ pub fn setup_logger(config: &AppConfig) -> Result<()> {
                 message
             ))
         })
-        .level(config.log)
+        .level(log_level)
         // senders are async and won't block the main thread
         .chain(tx)
         .apply()?;
+    
+    info!("Log filtering: {}", log_level);
 
     Ok(())
 }
