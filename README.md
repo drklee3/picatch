@@ -4,6 +4,9 @@
 
 ![picatch logo](./logo.png)
 
+⚠️ **Warning:** picatch is still in under early development. Major features and
+proper ui/ux are a work in progress. Major breaking changes are to be expected.
+
 Minimal photo gallery based on directory structure without a database. Utilizes
 [Actix web][actix-web].
 
