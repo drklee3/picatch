@@ -72,11 +72,16 @@ Then simply run the `picatch` executable.
 ## Configuration
 
 Most configuration options can be set either by environment variables or a
-config file.
+config file. Configuration options can be set via the config file and/or
+environment variables. The options that can **only** be set via environment
+variables are `PICATCH_CONFIG` and `PICATCH_LOG`.
+
+Environment variables will **override** config file settings.
 
 **Note:** If you are running picatch via Docker, you should set the directory
 options with bind mounts as shown above. Interface and port should be configured
-through Docker options as well.
+through Docker options as well. The only options you should be changing via
+config file or environment variables are the public options.
 
 ### Config File
 
@@ -117,10 +122,8 @@ url = "https://github.com/drklee3/"
 
 ### Environment Variables
 
-Log level can _only_ be set from the `PICATCH_lOG` environment variable as
-shown below. All other configuration options can be set via the config file
-and/or environment variables. Environment variables will override config file
-settings.
+Log level can only be set from the `PICATCH_lOG` environment variable as shown
+below.
 
 | Environment Variable | Default Value | Available options                                                   |
 | -------------------- | ------------- | ------------------------------------------------------------------- |
@@ -140,11 +143,11 @@ settings.
 Additional configuration options can be set to be displayed on the frontend such
 as the site name and displayed links.
 
-| Environment Variable           | Default Value | Example |
-| ------------------------------ | ------------- | ------- |
-| `PICATCH_PUBLIC.SITE_NAME`     | `picatch`     |         |
-| `PICATCH_PUBLIC.LINKS[i].TEXT` |               |         |
-| `PICATCH_PUBLIC.LINKS[i].URL`  |               |         |
+| Environment Variable           | Default Value |
+| ------------------------------ | ------------- |
+| `PICATCH_PUBLIC.SITE_NAME`     | `picatch`     |
+| `PICATCH_PUBLIC.LINKS[i].TEXT` |               |
+| `PICATCH_PUBLIC.LINKS[i].URL`  |               |
 
 Since there can be multiple links, `PICATCH_PUBLIC.LINKS` can be treated as an
 array. Replace `i` with the corresponding link index.
