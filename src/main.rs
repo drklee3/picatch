@@ -58,11 +58,11 @@ async fn run() -> Result<()> {
                 ),
             )
             .service(actix_files::Files::new(
-                "/photos/orig/",
+                "/photo/",
                 &config_clone.original_photos_dir,
             ))
             .service(actix_files::Files::new(
-                "/photos/scaled/",
+                "/photo_sized/",
                 &config_clone.resized_photos_dir,
             ))
             .service(web::resource("/{path:.*}").route(web::get().to(routes::static_files::path)))

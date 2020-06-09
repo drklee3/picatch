@@ -6,5 +6,10 @@ export const API_BASE_URL =
 
 export const IMAGE_BASE_URL =
     process.env.NODE_ENV === "production"
-        ? "/photos"
-        : "http://localhost:8080/photos";
+        ? "/photo"
+        : "http://localhost:8080/photo";
+
+export const RESIZED_IMAGE_BASE_URL =
+    process.env.NODE_ENV === "production"
+        ? "/photo_sized"
+        : "http://localhost:8080/photo_sized";
