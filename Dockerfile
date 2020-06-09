@@ -41,7 +41,7 @@ RUN rm ./target/release/deps/*picatch*
 RUN cargo build --release
 
 ## Final base image
-FROM alpine:3.12.0
+FROM debian:buster-slim
 COPY --from=back /picatch_source/target/release/picatch /picatch
 
 # Default dirs
