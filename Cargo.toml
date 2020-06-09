@@ -9,7 +9,7 @@ name = "picatch_lib"
 path = "src/lib.rs"
 
 [[bin]]
-name = "picatch_bin"
+name = "picatch"
 path = "src/main.rs"
 
 [dependencies]

@@ -42,12 +42,14 @@ RUN cargo build --release
 
 ## Final base image
 FROM alpine:3.12.0
-COPY --from=back /picatch_source/target/release/picatch_bin /picatch
+COPY --from=back /picatch_source/target/release/picatch /picatch
 
 # Default dirs
-ENV PICATCH_PHOTOS_DIR="/photos"
+ENV PICATCH_ORIGINAL_PHOTOS_DIR="/photos"
+ENV PICATCH_RESIZED_PHOTOS_DIR="/photos_resized"
 
 # Dir for external photos
 RUN mkdir -p /photos
+RUN mkdir -p /photos_resized
 EXPOSE 8080
 ENTRYPOINT ["/picatch"]

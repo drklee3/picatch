@@ -226,7 +226,7 @@ the files are correctly embedded.
 ### Running
 
 ```bash
-./target/release/picatch_bin
+./target/release/picatch
 ```
 
 [actix-web]: https://github.com/actix/actix-web
