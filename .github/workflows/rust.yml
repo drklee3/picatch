@@ -25,6 +25,7 @@ jobs:
 
   build:
     needs: frontend
+    continue-on-error: ${{ matrix.toolchain == "nightly" }}
     strategy:
       matrix:
         toolchain:
