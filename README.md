@@ -34,6 +34,7 @@ Minimal photo gallery based on directory structure without a database. Utilizes
     - [Frontend](#frontend-1)
     - [Backend](#backend-1)
   - [Running](#running-1)
+- [License](#license)
 
 ## Running
 
@@ -228,6 +229,10 @@ the files are correctly embedded.
 ```bash
 ./target/release/picatch
 ```
+
+## License
+
+MIT.
 
 [actix-web]: https://github.com/actix/actix-web
 [gh-workflow-ci]: https://github.com/drklee3/picatch/actions?query=workflow%3ACI
