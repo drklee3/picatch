@@ -1,6 +1,7 @@
 # picatch <!-- omit in toc -->
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/drklee3/picatch/Docker?style=flat-square)
+![Docker Image Size (tag)](https://img.shields.io/docker/image-size/drklee3/picatch/latest?style=flat-square)
 
 ![picatch logo](./logo.png)
 
@@ -40,10 +41,16 @@ Minimal photo gallery based on directory structure without a database. Utilizes
 
 ### via Docker
 
-Docker images are provided via GitHub Packages.
+Docker images are provided via both [Docker Hub][docker-hub] and [GitHub
+Packages][github-packages].
 
-First [authenticate with GitHub Packages][github-package-auth] by creating a
-personal access token with at least the `read:packages` scope.
+**Note:** If you are downloading from GitHub Packages, first [authenticate with
+GitHub Packages][github-package-auth] by creating a personal access token with
+at least the `read:packages` scope.
+
+To download from GitHub Packages instead of Docker Hub, replace the following
+instances of `drklee/picatch` with
+`docker.pkg.github.com/drklee3/picatch/picatch`
 
 To run picatch with `docker run`
 
@@ -51,7 +58,7 @@ To run picatch with `docker run`
 docker run \
     -p 8080:8080 \
     -v /path/to/your/photos:/photos \
-    docker.pkg.github.com/drklee3/picatch/picatch:latest
+    drklee3/picatch
 ```
 
 Alternatively with `docker-compose`
@@ -60,7 +67,7 @@ Alternatively with `docker-compose`
 version: "3"
 services:
   picatch:
-    image: docker.pkg.github.com/drklee3/picatch/picatch:latest
+    image: drklee3/picatch
     ports:
       - "8080:8080"
     volumes:
@@ -235,6 +242,8 @@ the files are correctly embedded.
 MIT.
 
 [actix-web]: https://github.com/actix/actix-web
+[docker-hub]: https://hub.docker.com/repository/docker/drklee3/picatch
 [gh-workflow-ci]: https://github.com/drklee3/picatch/actions?query=workflow%3ACI
 [github-package-auth]: https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-docker-for-use-with-github-packages#authenticating-to-github-packages
+[github-packages]: https://github.com/drklee3/picatch/packages
 [image]: https://github.com/image-rs/image
