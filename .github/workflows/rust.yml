@@ -25,14 +25,14 @@ jobs:
 
   build:
     needs: frontend
-    continue-on-error: ${{ matrix.toolchain == "nightly" }}
+    continue-on-error: ${{ matrix.toolchain == 'nightly' }}
     strategy:
       matrix:
         toolchain:
           - stable
           - beta
           - nightly
-          - 1.40.0 # MSRV
+          - 1.41.0 # MSRV
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
