@@ -1,13 +1,13 @@
 use crate::{
     error::{Error, Result},
-    model::config::AppConfig,
 };
 use std::fs::{self, create_dir_all};
 use std::path::{Path, PathBuf};
 
-pub fn verify_directories_exist(config: &AppConfig) -> Result<()> {
-    dir_exists_or_create(Path::new(&config.original_photos_dir))?;
-    dir_exists_or_create(Path::new(&config.resized_photos_dir))?;
+pub fn verify_directories_exist(dirs: Vec<&str>) -> Result<()> {
+    for dir in dirs {
+        dir_exists_or_create(Path::new(dir))?;
+    }
 
     Ok(())
 }

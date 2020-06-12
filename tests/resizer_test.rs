@@ -1,5 +1,5 @@
 use picatch_lib::{
-    filesystem::{resizer::resize_images, startup},
+    filesystem::{resizer::resize_images, utils},
     model::{
         config::{AppConfig, PubConfig},
         ResizeOptions,
@@ -28,15 +28,16 @@ fn builds_resized_file_path() {
 
     // Clear resized dir before resizing
     remove_dir_all(&config.resized_photos_dir).unwrap();
-    startup::verify_directories_exist(&config).unwrap();
+    utils::verify_directories_exist(vec![&config.original_photos_dir, &config.resized_photos_dir])
+        .unwrap();
 
-    let files = startup::get_all_files(Path::new(&config.original_photos_dir)).unwrap();
+    let files = utils::get_all_files(Path::new(&config.original_photos_dir)).unwrap();
     println!("Files to resize: {:#?}", &files);
     assert_eq!(3, files.len());
 
     resize_images(&config, files, opts_list).unwrap();
 
-    let resized_files = startup::get_all_files(Path::new(&config.resized_photos_dir)).unwrap();
+    let resized_files = utils::get_all_files(Path::new(&config.resized_photos_dir)).unwrap();
 
     assert_eq!(9, resized_files.len());
 }

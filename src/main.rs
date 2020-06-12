@@ -8,7 +8,7 @@ use dotenv;
 use std::process;
 
 use picatch_lib::{
-    error::Result, filesystem::startup::verify_directories_exist, model::config::AppConfig, routes,
+    error::Result, filesystem::utils::verify_directories_exist, model::config::AppConfig, routes,
     utils,
 };
 
@@ -33,7 +33,7 @@ async fn run() -> Result<()> {
     let config = AppConfig::new()?;
     debug!("Loaded config: {:#?}", config);
 
-    verify_directories_exist(&config)?;
+    verify_directories_exist(vec![&config.original_photos_dir, &config.resized_photos_dir])?;
 
     let config_clone = config.clone();
 

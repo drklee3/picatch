@@ -1,4 +1,4 @@
-use picatch_lib::filesystem::startup::get_all_files;
+use picatch_lib::filesystem::utils::get_all_files;
 use std::path::Path;
 
 #[test]

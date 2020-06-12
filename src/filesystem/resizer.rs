@@ -1,6 +1,6 @@
 use crate::{
     error::{Error, Result},
-    filesystem::{hash::get_image_hash, startup},
+    filesystem::{hash::get_image_hash, utils},
     model::{config::AppConfig, ResizeOptions},
 };
 use image::{imageops::FilterType, GenericImageView};
@@ -116,7 +116,7 @@ pub fn resize_images(
 
             let dest_path = get_resized_file_path(config, path, &img_path_str, &opts)?;
 
-            startup::dir_exists_or_create(
+            utils::dir_exists_or_create(
                 dest_path
                     .parent()
                     .ok_or(Error::Picatch("Failed to get resized file parent".into()))?,
