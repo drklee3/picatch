@@ -49,7 +49,7 @@ GitHub Packages][github-package-auth] by creating a personal access token with
 at least the `read:packages` scope.
 
 To download from GitHub Packages instead of Docker Hub, replace the following
-instances of `drklee/picatch` with
+instances of `drklee3/picatch` with
 `docker.pkg.github.com/drklee3/picatch/picatch`
 
 To run picatch with `docker run`
