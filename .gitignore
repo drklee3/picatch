@@ -4,6 +4,7 @@
 config.toml
 
 /photos/
+**/test_photos_resized
 
 # Logs
 logs
