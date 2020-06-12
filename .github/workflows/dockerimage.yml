@@ -49,7 +49,6 @@ jobs:
           registry: docker.pkg.github.com
           repository: drklee3/picatch/picatch
           tag_with_ref: true
-          tag_with_sha: true
       - name: Push image to Docker Hub
         uses: docker/build-push-action@v1
         with:
@@ -57,4 +56,3 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: drklee3/picatch
           tag_with_ref: true
-          tag_with_sha: true
