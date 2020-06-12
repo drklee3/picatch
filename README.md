@@ -1,7 +1,7 @@
 # picatch <!-- omit in toc -->
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/drklee3/picatch/Docker?style=flat-square)
-![Docker Image Size (tag)](https://img.shields.io/docker/image-size/drklee3/picatch/latest?style=flat-square)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/drklee3/picatch/Docker?style=flat-square)][github-workflow-docker]
+[![Docker Image Size (tag)](https://img.shields.io/docker/image-size/drklee3/picatch/latest?style=flat-square)][docker-hub]
 
 ![picatch logo](./logo.png)
 
@@ -77,7 +77,7 @@ services:
 ### via binary
 
 If you don't want to use docker, you can download the latest pre-built binary
-from the [GitHub Actions artfacts][gh-workflow-ci].
+from the [GitHub Actions artfacts][github-workflow-ci].
 
 Then simply run the `picatch` executable.
 
@@ -210,7 +210,7 @@ yarn && yarn build
 
 If you want to only build the backend yourself (if you don't have Node.js
 installed and don't want to install it or something), you can also download the
-built frontend files specifically from the [GitHub Actions artifacts][gh-workflow-ci].
+built frontend files specifically from the [GitHub Actions artifacts][github-workflow-ci].
 
 Extract the frontend files to `./web/build` then build the backend in the next step.
 
@@ -243,7 +243,8 @@ MIT.
 
 [actix-web]: https://github.com/actix/actix-web
 [docker-hub]: https://hub.docker.com/repository/docker/drklee3/picatch
-[gh-workflow-ci]: https://github.com/drklee3/picatch/actions?query=workflow%3ACI
+[github-workflow-ci]: https://github.com/drklee3/picatch/actions?query=workflow%3ACI
+[github-workflow-docker]: https://github.com/drklee3/picatch/actions?query=workflow%3ADocker
 [github-package-auth]: https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-docker-for-use-with-github-packages#authenticating-to-github-packages
 [github-packages]: https://github.com/drklee3/picatch/packages
 [image]: https://github.com/image-rs/image
