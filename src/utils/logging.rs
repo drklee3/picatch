@@ -22,9 +22,8 @@ pub fn setup_logger() -> Result<()> {
         .debug(Color::BrightCyan)
         .trace(Color::BrightMagenta);
 
-    let log_level =
-        LevelFilter::from_str(&env::var("PICATCH_LOG").unwrap_or("INFO".to_string()))
-            .unwrap_or(LevelFilter::Info);
+    let log_level = LevelFilter::from_str(&env::var("PICATCH_LOG").unwrap_or("INFO".to_string()))
+        .unwrap_or(LevelFilter::Info);
 
     fern::Dispatch::new()
         .format(move |out, message, record| {
@@ -40,7 +39,7 @@ pub fn setup_logger() -> Result<()> {
         // senders are async and won't block the main thread
         .chain(tx)
         .apply()?;
-    
+
     info!("Log filtering: {}", log_level);
 
     Ok(())

@@ -8,5 +8,5 @@ fn it_lists_all_files() {
 
     println!("{:?}", &files);
 
-    assert_eq!(5, files.len());
+    assert_eq!(3, files.len());
 }

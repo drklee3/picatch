@@ -2,8 +2,8 @@ use crate::{
     error::{Error, Result},
     model::config::AppConfig,
 };
-use std::fs::{self, create_dir_all, DirEntry};
-use std::path::Path;
+use std::fs::{self, create_dir_all};
+use std::path::{Path, PathBuf};
 
 pub fn verify_directories_exist(config: &AppConfig) -> Result<()> {
     dir_exists_or_create(Path::new(&config.original_photos_dir))?;
@@ -12,7 +12,7 @@ pub fn verify_directories_exist(config: &AppConfig) -> Result<()> {
     Ok(())
 }
 
-fn dir_exists_or_create(path: &Path) -> Result<()> {
+pub fn dir_exists_or_create(path: &Path) -> Result<()> {
     if path.exists() && path.is_dir() {
         return Ok(());
     }
@@ -37,14 +37,14 @@ fn dir_exists_or_create(path: &Path) -> Result<()> {
     Ok(())
 }
 
-pub fn get_all_files(path: &Path) -> Result<Vec<DirEntry>> {
+pub fn get_all_files(path: &Path) -> Result<Vec<PathBuf>> {
     let mut files = list_files_recursive(path)?;
-    files.sort_by(|a, b| a.path().cmp(&b.path()));
+    files.sort();
 
     Ok(files)
 }
 
-fn list_files_recursive(dir: &Path) -> Result<Vec<DirEntry>> {
+fn list_files_recursive(dir: &Path) -> Result<Vec<PathBuf>> {
     let mut files = Vec::new();
 
     if dir.is_dir() {
@@ -55,7 +55,7 @@ fn list_files_recursive(dir: &Path) -> Result<Vec<DirEntry>> {
             if path.is_dir() {
                 files.append(&mut list_files_recursive(&path)?);
             } else {
-                files.push(entry);
+                files.push(entry.path());
             }
         }
     }
