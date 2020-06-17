@@ -76,7 +76,7 @@ services:
 
 ### via binary
 
-If you don't want to use docker, you can download the latest pre-built binary
+If you don't want to use Docker, you can download the latest pre-built binary
 from the [GitHub Actions artfacts][github-workflow-ci].
 
 Then simply run the `picatch` executable.
