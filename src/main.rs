@@ -33,7 +33,10 @@ async fn run() -> Result<()> {
     let config = AppConfig::new()?;
     debug!("Loaded config: {:#?}", config);
 
-    verify_directories_exist(vec![&config.original_photos_dir, &config.resized_photos_dir])?;
+    verify_directories_exist(vec![
+        &config.original_photos_dir,
+        &config.resized_photos_dir,
+    ])?;
 
     let config_clone = config.clone();
 

@@ -2,7 +2,7 @@ use picatch_lib::{
     filesystem::{resizer::resize_images, utils},
     model::{
         config::{AppConfig, PubConfig},
-        ResizeOptions,
+        ResizeOptions, ImageSize
     },
 };
 use std::{fs::remove_dir_all, path::Path};
@@ -17,25 +17,28 @@ fn builds_resized_file_path() {
         port: 8080,
     };
 
-    let opts_list = vec![
-        ResizeOptions::new("pixel")
-            .set_width(1)
-            .set_height(1)
-            .set_mode(2),
-        ResizeOptions::new("large").set_height(1080),
-        ResizeOptions::new("thumb").set_height(128),
+    let opts_list: Vec<ResizeOptions> = vec![
+        ImageSize::Pixel.into(),
+        ImageSize::Small.into(),
+        ImageSize::Large.into(),
     ];
 
     // Clear resized dir before resizing
     remove_dir_all(&config.resized_photos_dir).unwrap();
-    utils::verify_directories_exist(vec![&config.original_photos_dir, &config.resized_photos_dir])
-        .unwrap();
+    utils::verify_directories_exist(vec![
+        &config.original_photos_dir,
+        &config.resized_photos_dir,
+    ])
+    .unwrap();
 
-    let files = utils::get_all_files(Path::new(&config.original_photos_dir)).unwrap();
-    println!("Files to resize: {:#?}", &files);
-    assert_eq!(3, files.len());
+    let source_files = utils::get_all_files(Path::new(&config.original_photos_dir)).unwrap();
+    let resized_files = utils::get_all_files(Path::new(&config.resized_photos_dir)).unwrap();
+    let jobs = utils::get_files_not_resized(&config, &source_files, resized_files, &opts_list).unwrap();
 
-    resize_images(&config, files, opts_list).unwrap();
+    println!("Resize jobs: {:#?}", &jobs);
+    assert_eq!(9, jobs.len());
+
+    resize_images(jobs).unwrap();
 
     let resized_files = utils::get_all_files(Path::new(&config.resized_photos_dir)).unwrap();
 

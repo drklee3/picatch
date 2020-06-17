@@ -1,12 +1,11 @@
 use crate::{
     error::{Error, Result},
     filesystem::{hash::get_image_hash, utils},
-    model::{config::AppConfig, ResizeOptions},
+    model::{config::AppConfig, ResizeJob, ResizeOptions},
 };
-use image::{imageops::FilterType, GenericImageView};
-use std::path::{Path, PathBuf};
+use image::{imageops::FilterType, DynamicImage, GenericImageView};
 
-pub fn resize(img: &image::DynamicImage, opts: &ResizeOptions) -> Result<image::DynamicImage> {
+pub fn resize(img: &DynamicImage, opts: &ResizeOptions) -> Result<image::DynamicImage> {
     let old_w = img.width();
     let old_h = img.height();
 
@@ -35,62 +34,7 @@ pub fn resize(img: &image::DynamicImage, opts: &ResizeOptions) -> Result<image::
     Ok(resized_img)
 }
 
-pub fn get_resized_file_path(
-    config: &AppConfig,
-    path: &Path,
-    img_path_str: &str,
-    opts: &ResizeOptions,
-) -> Result<PathBuf> {
-    // resized dir + relative file path + size
-    let mut dest_path = PathBuf::from(&config.resized_photos_dir);
-
-    // Just in case, check if path includes original_photos_dir
-    if dest_path.starts_with(&config.original_photos_dir) {
-        dest_path = dest_path
-            .strip_prefix(&config.original_photos_dir)
-            .map_err(|_| Error::Picatch(format!("Failed to strip prefix: {}", img_path_str)))?
-            .to_path_buf();
-    }
-
-    // Get file stem first, in case there isn't a file name provided
-    let file_name = path
-        .file_stem()
-        .ok_or(Error::Picatch(format!(
-            "Path missing file name: {}",
-            img_path_str
-        )))?
-        .to_string_lossy();
-
-    let file_dir = path
-        .parent()
-        .ok_or(Error::Picatch(format!(
-            "Path missing parent: {}",
-            img_path_str
-        )))?
-        .strip_prefix(&config.original_photos_dir)
-        .map_err(|_| Error::Picatch(format!("Failed to strip prefix: {}", img_path_str)))?;
-
-    println!("File parent {}", file_dir.to_string_lossy());
-
-    dest_path.push(file_dir);
-
-    let file_ext = path
-        .extension()
-        .ok_or(Error::Picatch(format!(
-            "Path missing extension: {}",
-            img_path_str
-        )))?
-        .to_string_lossy();
-
-    // Create new file name with size attached.
-    // Not including hash for now, frontend doesn't know about the hash
-    let new_file_name = format!("{}-{}.{}", file_name, opts.name, file_ext);
-    dest_path.push(&new_file_name);
-
-    Ok(dest_path)
-}
-
-pub fn resize_images(
+pub fn _resize_images(
     config: &AppConfig,
     paths: Vec<std::path::PathBuf>,
     opts_list: Vec<ResizeOptions>,
@@ -109,12 +53,11 @@ pub fn resize_images(
         };
 
         debug!("Image hash: {}", &img_hash);
-        let img_path_str = path.to_string_lossy();
 
         for opts in &opts_list {
             let resized_img = resize(&img, &opts)?;
 
-            let dest_path = get_resized_file_path(config, path, &img_path_str, &opts)?;
+            let dest_path = utils::get_destination_path(config, path, &opts)?;
 
             utils::dir_exists_or_create(
                 dest_path
@@ -126,6 +69,46 @@ pub fn resize_images(
 
             resized_img.save(dest_path)?;
         }
+    }
+
+    Ok(())
+}
+
+pub fn resize_images(jobs: Vec<ResizeJob>) -> Result<()> {
+    if jobs.is_empty() {
+        return Ok(());
+    }
+
+    // Make mutable
+    let mut jobs = jobs;
+
+    // Sort so that same source jobs are next to each other, open source once and reuse buf
+    jobs.sort_by(|a, b| a.source.cmp(&b.source));
+
+    // Safe to unwrap, checked if empty earlier
+    let mut prev_job = jobs.first().unwrap();
+    let mut img = image::open(prev_job.source)?;
+    
+    println!("Resize jobs (sorted): {:#?}", &jobs);
+
+    for job in &jobs {
+        // Open image if it's a new one
+        if prev_job.source != job.source {
+            println!("New image, opening file");
+            img = image::open(job.source)?;
+        } else {
+            println!("Image already in memory, continuing to resize");
+        }
+        prev_job = job;
+
+        // Make sure destination dir exists
+        utils::dir_exists_or_create(&job.destination.parent().ok_or(Error::Picatch(format!(
+            "Failed to get resized file parent: {}",
+            &job.source.to_string_lossy()
+        )))?)?;
+
+        let resized_img = resize(&img, job.options)?;
+        resized_img.save(&job.destination)?;
     }
 
     Ok(())
