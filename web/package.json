@@ -39,7 +39,7 @@
         ]
     },
     "devDependencies": {
-        "@tanem/react-nprogress": "^3.0.25",
+        "@tanem/react-nprogress": "^3.0.30",
         "@types/react-lazyload": "^2.6.0",
         "@types/react-router-dom": "^5.1.5",
         "eslint-plugin-react-hooks": "^4.0.4",
