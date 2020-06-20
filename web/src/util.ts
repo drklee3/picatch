@@ -1,4 +1,9 @@
-import { API_BASE_URL, IMAGE_BASE_URL, ImageSize } from "./constants";
+import {
+    API_BASE_URL,
+    IMAGE_BASE_URL,
+    RESIZED_IMAGE_BASE_URL,
+    ImageSize,
+} from "./constants";
 import { PathComponents, DirectoryListing, DirectoryItem } from "./types";
 
 export async function fetchAlbumData(
@@ -15,9 +20,12 @@ export function getPhotoUrl(
 ) {
     let dotIndex = item.name.lastIndexOf(".");
     let fileName = item.name.slice(0, dotIndex);
-    let fileExtension = item.name.slice(dotIndex);
+    let fileExtension = item.name.slice(dotIndex + 1);
 
-    return `${IMAGE_BASE_URL}${pathComp.album}${fileName}-${size}.${fileExtension}`;
+    let baseUrl =
+        size === ImageSize.Original ? IMAGE_BASE_URL : RESIZED_IMAGE_BASE_URL;
+
+    return `${baseUrl}${pathComp.album}${fileName}-${size}.${fileExtension}`;
 }
 
 export function imageIsActive(pathComp: PathComponents, item: DirectoryItem) {

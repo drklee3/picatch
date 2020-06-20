@@ -52,7 +52,7 @@ impl From<ImageSize> for ResizeOptions {
                 .set_mode(2),
             ImageSize::Thumbnail => ResizeOptions::new("thumbnail").set_height(128),
             ImageSize::Small => ResizeOptions::new("small").set_height(270),
-            ImageSize::Medium => ResizeOptions::new("medium").set_height(540),
+            ImageSize::Medium => ResizeOptions::new("medium").set_height(640),
             ImageSize::Large => ResizeOptions::new("large").set_height(1080),
         }
     }

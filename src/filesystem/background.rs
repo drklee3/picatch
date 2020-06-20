@@ -38,6 +38,7 @@ fn run_resizer_thread(config: AppConfig) -> Result<()> {
     let opts_list: Vec<ResizeOptions> = vec![
         ImageSize::Pixel.into(),
         ImageSize::Small.into(),
+        ImageSize::Medium.into(),
         ImageSize::Large.into(),
     ];
     

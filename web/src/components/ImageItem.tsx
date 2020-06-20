@@ -13,8 +13,8 @@ function ImageItem({
     index,
     dispatch,
 }: AlbumItemProps) {
-    const size = active ? ImageSize.Large : ImageSize.Thumbnail;
-    const src = getPhotoUrl(pathComponents, item, size);
+    const src = getPhotoUrl(pathComponents, item, ImageSize.Medium);
+    const largeSrc = getPhotoUrl(pathComponents, item, ImageSize.Large);
 
     function updateActiveFile() {
         // If already active, set to none
@@ -41,7 +41,11 @@ function ImageItem({
         >
             {active && (
                 <div className="img-fullscreen-wrapper">
-                    <img src={src} alt={item.name} className="img-fullscreen" />
+                    <img
+                        src={largeSrc}
+                        alt={item.name}
+                        className="img-fullscreen"
+                    />
                 </div>
             )}
             <LazyLoad
