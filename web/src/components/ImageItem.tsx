@@ -4,6 +4,7 @@ import { AlbumItemProps } from "./AlbumItem";
 import Image from "./Image";
 import { getPhotoUrl } from "../util";
 import { ActiveFileActions } from "../reducers/activeFileActions";
+import { ImageSize } from "../constants";
 
 function ImageItem({
     active,
@@ -12,7 +13,8 @@ function ImageItem({
     index,
     dispatch,
 }: AlbumItemProps) {
-    const src = getPhotoUrl(pathComponents, item);
+    const size = active ? ImageSize.Large : ImageSize.Thumbnail;
+    const src = getPhotoUrl(pathComponents, item, size);
 
     function updateActiveFile() {
         // If already active, set to none

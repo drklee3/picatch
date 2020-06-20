@@ -5,6 +5,9 @@ config.toml
 
 /photos/
 **/test_photos_resized
+/photos_resized/
+notes.md
+logo.psd
 
 # Logs
 logs

@@ -3,6 +3,7 @@ use config::ConfigError;
 use fern::InitError as FernError;
 use image::ImageError;
 use log::SetLoggerError;
+use notify::Error as NotifyError;
 use serde::{Deserialize, Serialize};
 use std::fmt::Error as FmtError;
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -28,6 +29,8 @@ pub enum Error {
     Image(ImageError),
     /// `std::io` error
     Io(IoError),
+    /// `Notify` error
+    Notify(NotifyError),
     /// `log` set_logger error
     SetLogger(SetLoggerError),
     /// `toml` deserialize error
@@ -71,6 +74,12 @@ impl From<IoError> for Error {
     }
 }
 
+impl From<NotifyError> for Error {
+    fn from(err: NotifyError) -> Error {
+        Error::Notify(err)
+    }
+}
+
 impl From<SetLoggerError> for Error {
     fn from(err: SetLoggerError) -> Error {
         Error::SetLogger(err)
@@ -111,6 +120,7 @@ impl Display for Error {
             Error::Image(ref inner) => inner.fmt(f),
             Error::SetLogger(ref inner) => inner.fmt(f),
             Error::Io(ref inner) => inner.fmt(f),
+            Error::Notify(ref inner) => inner.fmt(f),
             Error::TomlDe(ref inner) => inner.fmt(f),
             Error::TomlSe(ref inner) => inner.fmt(f),
             Error::InternalServerError => write!(f, "Internal Server Error"),

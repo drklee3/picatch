@@ -8,7 +8,7 @@ use dotenv;
 use std::process;
 
 use picatch_lib::{
-    error::Result, filesystem::utils::verify_directories_exist, model::config::AppConfig, routes,
+    error::Result, filesystem::{utils::verify_directories_exist, background}, model::config::AppConfig, routes,
     utils,
 };
 
@@ -17,7 +17,7 @@ async fn main() {
     // Wrap run fn so we can catch all errors and print them properly
     match run().await {
         Ok(_) => {
-            println!("bye bye");
+            info!("bye bye");
             process::exit(0)
         }
         Err(err) => {
@@ -37,6 +37,8 @@ async fn run() -> Result<()> {
         &config.original_photos_dir,
         &config.resized_photos_dir,
     ])?;
+
+    background::start_resizer_thread(&config);
 
     let config_clone = config.clone();
 

@@ -4,6 +4,9 @@ use crate::{
     model::{config::AppConfig, ResizeJob, ResizeOptions},
 };
 use image::{imageops::FilterType, DynamicImage, GenericImageView};
+use std::collections::HashMap;
+use std::path::PathBuf;
+use threadpool::ThreadPool;
 
 pub fn resize(img: &DynamicImage, opts: &ResizeOptions) -> Result<image::DynamicImage> {
     let old_w = img.width();
@@ -74,41 +77,35 @@ pub fn _resize_images(
     Ok(())
 }
 
-pub fn resize_images(jobs: Vec<ResizeJob>) -> Result<()> {
-    if jobs.is_empty() {
+pub fn resize_images(pool: &ThreadPool, jobs_map: HashMap<PathBuf, Vec<ResizeJob>>) -> Result<()> {
+    if jobs_map.is_empty() {
         return Ok(());
     }
 
-    // Make mutable
-    let mut jobs = jobs;
+    for (source, jobs) in jobs_map {
+        let img = image::open(source)?;
 
-    // Sort so that same source jobs are next to each other, open source once and reuse buf
-    jobs.sort_by(|a, b| a.source.cmp(&b.source));
+        // jobs is a list
+        for job in jobs {
+            let img = img.clone();
 
-    // Safe to unwrap, checked if empty earlier
-    let mut prev_job = jobs.first().unwrap();
-    let mut img = image::open(prev_job.source)?;
-    
-    println!("Resize jobs (sorted): {:#?}", &jobs);
+            pool.execute(move || {
+                // Make sure destination dir exists
+                let dir = job
+                    .destination
+                    .parent()
+                    .ok_or(Error::Picatch(format!(
+                        "Failed to get resized file parent: {}",
+                        &job.source.to_string_lossy()
+                    )))
+                    .unwrap();
 
-    for job in &jobs {
-        // Open image if it's a new one
-        if prev_job.source != job.source {
-            println!("New image, opening file");
-            img = image::open(job.source)?;
-        } else {
-            println!("Image already in memory, continuing to resize");
+                utils::dir_exists_or_create(&dir).unwrap();
+
+                let resized_img = resize(&img, &job.options).unwrap();
+                resized_img.save(&job.destination).unwrap();
+            });
         }
-        prev_job = job;
-
-        // Make sure destination dir exists
-        utils::dir_exists_or_create(&job.destination.parent().ok_or(Error::Picatch(format!(
-            "Failed to get resized file parent: {}",
-            &job.source.to_string_lossy()
-        )))?)?;
-
-        let resized_img = resize(&img, job.options)?;
-        resized_img.save(&job.destination)?;
     }
 
     Ok(())

@@ -13,3 +13,12 @@ export const RESIZED_IMAGE_BASE_URL =
     process.env.NODE_ENV === "production"
         ? "/photo_sized"
         : "http://localhost:8080/photo_sized";
+
+// Should be synchronized with rust part
+export enum ImageSize {
+    Pixel = "pixel",
+    Thumbnail = "thumbnail",
+    Small = "small",
+    Medium = "medium",
+    Large = "large",
+}

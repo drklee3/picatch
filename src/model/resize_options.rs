@@ -2,7 +2,7 @@ use crate::model::ImageSize;
 use image::imageops::FilterType;
 use std::convert::From;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ResizeOptions {
     pub name: String,
     pub width: Option<u32>,

@@ -1,9 +1,9 @@
 use crate::model::ResizeOptions;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
-#[derive(Debug)]
-pub struct ResizeJob<'a> {
-    pub source: &'a Path,
+#[derive(Clone, Debug)]
+pub struct ResizeJob {
+    pub source: PathBuf,
     pub destination: PathBuf,
-    pub options: &'a ResizeOptions,
+    pub options: ResizeOptions,
 }

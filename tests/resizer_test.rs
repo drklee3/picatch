@@ -1,14 +1,19 @@
 use picatch_lib::{
-    filesystem::{resizer::resize_images, utils},
+    filesystem::{utils, background},
     model::{
         config::{AppConfig, PubConfig},
-        ResizeOptions, ImageSize
+        ImageSize, ResizeOptions,
     },
+    utils::logging
 };
 use std::{fs::remove_dir_all, path::Path};
+use num_cpus;
+use threadpool::ThreadPool;
 
 #[test]
 fn builds_resized_file_path() {
+    logging::setup_logger().unwrap();
+
     let config = AppConfig {
         public: PubConfig::default(),
         original_photos_dir: "./tests/test_photos".into(),
@@ -31,14 +36,12 @@ fn builds_resized_file_path() {
     ])
     .unwrap();
 
-    let source_files = utils::get_all_files(Path::new(&config.original_photos_dir)).unwrap();
-    let resized_files = utils::get_all_files(Path::new(&config.resized_photos_dir)).unwrap();
-    let jobs = utils::get_files_not_resized(&config, &source_files, resized_files, &opts_list).unwrap();
+    let workers = num_cpus::get();
+    let pool = ThreadPool::new(workers);
 
-    println!("Resize jobs: {:#?}", &jobs);
-    assert_eq!(9, jobs.len());
+    background::startup_resize(&pool, &config, opts_list).unwrap();
 
-    resize_images(jobs).unwrap();
+    pool.join();
 
     let resized_files = utils::get_all_files(Path::new(&config.resized_photos_dir)).unwrap();
 

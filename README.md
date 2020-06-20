@@ -27,7 +27,7 @@ Minimal photo gallery based on directory structure without a database. Utilizes
     - [Application Options](#application-options)
     - [Public Options](#public-options)
     - [Example](#example)
-- [Compiling from source](#compiling-from-source)
+- [Compiling From Source](#compiling-from-source)
   - [Requirements](#requirements)
     - [Backend](#backend)
     - [Frontend](#frontend)
@@ -184,7 +184,7 @@ env PICATCH_ORIGINAL_PHOTOS_DIR=./photos \
     picatch
 ```
 
-## Compiling from source
+## Compiling From Source
 
 ### Requirements
 
