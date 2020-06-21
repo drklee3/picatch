@@ -42,9 +42,14 @@ function ImageItem({
             {active && (
                 <div className="img-fullscreen-wrapper">
                     <img
+                        src={src}
+                        alt={item.name}
+                        className="img-fullscreen img-fullscreen-thumbnail"
+                    />
+                    <Image
                         src={largeSrc}
                         alt={item.name}
-                        className="img-fullscreen"
+                        className="img-fullscreen invisible"
                     />
                 </div>
             )}

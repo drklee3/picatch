@@ -41,6 +41,16 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+
+        .img-fullscreen-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            position: absolute;
+            z-index: -1;
         }
     }
 
