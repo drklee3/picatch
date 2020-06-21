@@ -106,11 +106,6 @@ pub fn get_files_not_resized(
     // let orig_files = get_all_files(Path::new(&config.original_photos_dir))?;
     let resized_files: HashSet<PathBuf> = HashSet::from_iter(resized_files);
 
-    // Correct number of files, just exit ez
-    if source_files.len() * options_list.len() == resized_files.len() {
-        return Ok(HashMap::new());
-    }
-
     let mut to_resize = HashMap::new();
 
     for file in source_files {
