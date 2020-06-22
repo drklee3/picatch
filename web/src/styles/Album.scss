@@ -16,8 +16,7 @@
     .img-thumbnail {
         max-height: 100%;
         min-height: 100%;
-        min-width: 100%;
-        width: auto;
+        width: 100%;
         object-fit: cover;
         display: block;
 
@@ -63,6 +62,8 @@
 @media (max-aspect-ratio: 1/1) {
     .img-wrapper {
         height: 30vh;
+        min-width: 40vw;
+        max-width: 100%;
     }
 }
 
@@ -70,23 +71,5 @@
 @media (max-height: 480px) {
     .img-wrapper {
         height: 80vh;
-    }
-}
-
-// Small + Portrait devices
-@media (max-aspect-ratio: 1/1) and (max-width: 480px) {
-    #image-list {
-        flex-direction: row;
-    }
-
-    .img-wrapper {
-        height: auto;
-        width: 100%;
-    }
-
-    .img-wrapper img {
-        width: 100%;
-        max-height: 75vh;
-        min-width: 0;
     }
 }
