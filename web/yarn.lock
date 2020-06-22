@@ -1344,15 +1344,15 @@
     "@svgr/plugin-svgo" "^4.3.1"
     loader-utils "^1.2.3"
 
-"@tanem/react-nprogress@^3.0.30":
-  version "3.0.30"
-  resolved "https://registry.yarnpkg.com/@tanem/react-nprogress/-/react-nprogress-3.0.30.tgz#16d22cb835646404a54ea3c528deed58a6ed2f97"
-  integrity sha512-cj1+kC0ciCncOhiYV9CH9LcclPC6gRtgsGmyaMt3HsXzxJkJErdv1EZrxQyhI18GgLhF/C2dHW9ymvDDKGRrrQ==
+"@tanem/react-nprogress@^3.0.31":
+  version "3.0.31"
+  resolved "https://registry.yarnpkg.com/@tanem/react-nprogress/-/react-nprogress-3.0.31.tgz#7a3fa4c37ba46aec76993202235a4f1644b3ccf0"
+  integrity sha512-T+OocM6g0cksPE4H/YHukx21R+kpO2vMwWusTAR/uEMxuOLxIuIN47HIi7pftbTWPpwJyZF9gXPoIa6cun3lOQ==
   dependencies:
     "@babel/runtime" "^7.10.2"
     hoist-non-react-statics "^3.3.2"
     prop-types "^15.7.2"
-    react-use "^15.2.2"
+    react-use "^15.2.5"
 
 "@testing-library/dom@^7.14.2":
   version "7.16.2"
@@ -9323,10 +9323,10 @@ react-universal-interface@^0.6.2:
   resolved "https://registry.yarnpkg.com/react-universal-interface/-/react-universal-interface-0.6.2.tgz#5e8d438a01729a4dbbcbeeceb0b86be146fe2b3b"
   integrity sha512-dg8yXdcQmvgR13RIlZbTRQOoUrDciFVoSBZILwjE2LFISxZZ8loVJKAkuzswl5js8BHda79bIb2b84ehU8IjXw==
 
-react-use@^15.2.2:
-  version "15.2.5"
-  resolved "https://registry.yarnpkg.com/react-use/-/react-use-15.2.5.tgz#bf5a9b2383f47286416a0ed50c646716029210c5"
-  integrity sha512-Lhbt5yvJ3hfbShpjbba7onCueyfpmucQr8MzvPjGwgFA6wKVBfVRT8zzPlZIAeXmWa9k+GfpOZ8OcSQqRh2DHQ==
+react-use@^15.2.5:
+  version "15.3.0"
+  resolved "https://registry.yarnpkg.com/react-use/-/react-use-15.3.0.tgz#42946aa6e7bf571104173439cc7b7e26a4ca4c51"
+  integrity sha512-4fFSn2eVbmRPlxHFeBy8uiCyrwMzavMs4hvzeDUFszijda9ZM6S0ElleqKHS+SmwpMFEFIk7dIzzJQZzJYcAXw==
   dependencies:
     "@types/js-cookie" "2.2.6"
     "@xobotyi/scrollbar-width" "1.9.5"
