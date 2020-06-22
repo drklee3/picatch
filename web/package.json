@@ -3,6 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
+        "@tanem/react-nprogress": "^3.0.31",
         "react": "^16.13.1",
         "react-dom": "^16.13.1",
         "react-lazyload": "^2.6.8",
@@ -31,7 +32,6 @@
         ]
     },
     "devDependencies": {
-        "@tanem/react-nprogress": "^3.0.31",
         "@testing-library/jest-dom": "^5.10.1",
         "@testing-library/react": "^10.3.0",
         "@testing-library/user-event": "^12.0.7",
