@@ -12,7 +12,7 @@ function ImageItem(props: Props) {
         if (setIsLoading) {
             setIsLoading(true);
         }
-    }, []);
+    }, [setIsLoading]);
 
     const onLoad = () => {
         setLoaded(true);

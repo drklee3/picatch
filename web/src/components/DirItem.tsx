@@ -18,10 +18,10 @@ function DirItem({ pathComponents, item, dispatch }: AlbumItemProps) {
     }
 
     return (
-        <li className={`img-wrapper`}>
+        <div className={`img-wrapper`}>
             <p>{pathComponents.album + item.name}</p>
             <button onClick={() => goToAlbum()}>Album: {item.name}</button>
-        </li>
+        </div>
     );
 }
 
