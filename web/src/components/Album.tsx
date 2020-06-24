@@ -166,14 +166,12 @@ function Album(props: AlbumProps) {
         }
     }, [isDirectLink, activeFileState, files, history]);
 
-    console.log("width:", width);
-
     return (
         <div>
             <ProgressBar isAnimating={isLoading} />
             {error && <p>Failed to fetch images</p>}
             <div id="image-list" ref={layoutRef}>
-                <JustifiedLayout containerWidth={width}>
+                <JustifiedLayout containerWidth={width} containerPadding={0}>
                     {files.map((f, i) => (
                         <div
                             style={{

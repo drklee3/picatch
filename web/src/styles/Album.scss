@@ -2,6 +2,7 @@
     display: flex;
     flex-wrap: wrap;
 
+    margin-top: 10px;
     padding: 1px;
 
     align-content: flex-start;
@@ -62,21 +63,5 @@
             position: absolute;
             z-index: -2;
         }
-    }
-}
-
-// Portait devices
-@media (max-aspect-ratio: 1/1) {
-    .img-wrapper {
-        height: 30vh;
-        min-width: 40vw;
-        max-width: 100%;
-    }
-}
-
-// Short height devices
-@media (max-height: 480px) {
-    .img-wrapper {
-        height: 80vh;
     }
 }
