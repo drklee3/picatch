@@ -35,7 +35,7 @@ function ImageItem({
     }
 
     return (
-        <li
+        <div
             className={`img-wrapper ${active ? "active" : ""}`}
             onClick={updateActiveFile}
         >
@@ -56,8 +56,9 @@ function ImageItem({
             <LazyLoad
                 height="100%"
                 offset={100}
-                placeholder={<p>placeholder</p>}
+                placeholder={<div className="img-placeholder" />}
             >
+                <div className="img-thumbnail-background" />
                 <Image
                     src={src}
                     alt={item.name}
@@ -66,7 +67,7 @@ function ImageItem({
                     height={item.dimensions?.height}
                 />
             </LazyLoad>
-        </li>
+        </div>
     );
 }
 

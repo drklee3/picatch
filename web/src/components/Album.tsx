@@ -1,14 +1,27 @@
-import React, { useEffect, useState, useReducer } from "react";
+import React, {
+    createContext,
+    useEffect,
+    useState,
+    useRef,
+    useReducer,
+} from "react";
 import { RouteComponentProps, useHistory } from "react-router";
+import JustifiedLayout from "./JustifiedLayout";
 import AlbumItem from "./AlbumItem";
 import ProgressBar from "./nprogress/ProgressBar";
 import { HistoryState } from "../types";
 import usePathComponents from "../hooks/usePathComponents";
 import useAlbumApi from "../hooks/useAlbumApi";
 import useKeyboardNavigation from "../hooks/useKeyboardNavigation";
+import useResize from "../hooks/useResize";
 import activeFileReducer from "../reducers/activeFileReducer";
 import { ActiveFileActions } from "../reducers/activeFileActions";
 import { getPathComponents } from "../util";
+
+export const StateContext = createContext({
+    isLoading: false,
+    setLoading: (loading: boolean) => {},
+});
 
 type AlbumProps = RouteComponentProps & {
     root?: boolean;
@@ -28,6 +41,9 @@ function Album(props: AlbumProps) {
         name: path.file || "",
         index: -1,
     });
+
+    const layoutRef = useRef<HTMLDivElement>(null);
+    const { width } = useResize(layoutRef);
 
     const keyPressed = useKeyboardNavigation();
 
@@ -150,24 +166,34 @@ function Album(props: AlbumProps) {
         }
     }, [isDirectLink, activeFileState, files, history]);
 
+    console.log("width:", width);
+
     return (
         <div>
             <ProgressBar isAnimating={isLoading} />
             {error && <p>Failed to fetch images</p>}
-            <ul id="image-list">
-                {files.map((f, i) => (
-                    <AlbumItem
-                        pathComponents={path}
-                        active={activeFileState.index === i}
-                        activeFileState={activeFileState}
-                        dispatch={dispatch}
-                        index={i}
-                        item={f}
-                        key={f.name}
-                    />
-                ))}
-                <li className="img-wrapper" />
-            </ul>
+            <div id="image-list" ref={layoutRef}>
+                <JustifiedLayout containerWidth={width}>
+                    {files.map((f, i) => (
+                        <div
+                            style={{
+                                width: f.dimensions?.width || 600,
+                                height: f.dimensions?.height || 600,
+                            }}
+                            key={f.name}
+                        >
+                            <AlbumItem
+                                pathComponents={path}
+                                active={activeFileState.index === i}
+                                activeFileState={activeFileState}
+                                dispatch={dispatch}
+                                index={i}
+                                item={f}
+                            />
+                        </div>
+                    ))}
+                </JustifiedLayout>
+            </div>
         </div>
     );
 }

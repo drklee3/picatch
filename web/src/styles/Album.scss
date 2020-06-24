@@ -3,25 +3,36 @@
     flex-wrap: wrap;
 
     padding: 1px;
-    list-style: none;
 
     align-content: flex-start;
 }
 
 .img-wrapper {
-    height: 35vh;
-    padding: 2px;
-    flex-grow: 1;
+    height: 100%;
+
+    .img-placeholder {
+        width: 100%;
+        height: 100%;
+    }
 
     .img-thumbnail {
-        max-height: 100%;
-        min-height: 100%;
         width: 100%;
-        object-fit: cover;
-        display: block;
+        height: 100%;
 
         // hide alt-text
         color: transparent;
+        position: relative;
+        z-index: 1;
+    }
+
+    .img-thumbnail-background {
+        width: 100%;
+        height: 100%;
+
+        position: absolute;
+        z-index: 0;
+        background-color: #ffffff;
+        opacity: 0.25;
     }
 
     .img-fullscreen-wrapper {
@@ -49,12 +60,8 @@
             height: 100%;
             object-fit: contain;
             position: absolute;
-            z-index: -1;
+            z-index: -2;
         }
-    }
-
-    &:last-child {
-        flex-grow: 10;
     }
 }
 
