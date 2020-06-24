@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import LazyLoad from "react-lazyload";
 import { AlbumItemProps } from "./AlbumItem";
 import Image from "./Image";
 import { getPhotoUrl } from "../util";
 import { ActiveFileActions } from "../reducers/activeFileActions";
 import { ImageSize } from "../constants";
+import { LoadingContext } from "../contexts/LoadingContext";
 
 function ImageItem({
     active,
@@ -15,6 +16,8 @@ function ImageItem({
 }: AlbumItemProps) {
     const src = getPhotoUrl(pathComponents, item, ImageSize.Medium);
     const largeSrc = getPhotoUrl(pathComponents, item, ImageSize.Large);
+
+    const { setIsLoading } = useContext(LoadingContext);
 
     function updateActiveFile() {
         // If already active, set to none
@@ -49,6 +52,7 @@ function ImageItem({
                     <Image
                         src={largeSrc}
                         alt={item.name}
+                        setIsLoading={setIsLoading}
                         className="img-fullscreen invisible"
                     />
                 </div>

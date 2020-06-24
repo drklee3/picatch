@@ -1,10 +1,4 @@
-import React, {
-    createContext,
-    useEffect,
-    useState,
-    useRef,
-    useReducer,
-} from "react";
+import React, { useEffect, useState, useRef, useReducer } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
 import JustifiedLayout from "./JustifiedLayout";
 import AlbumItem from "./AlbumItem";
@@ -17,11 +11,7 @@ import useResize from "../hooks/useResize";
 import activeFileReducer from "../reducers/activeFileReducer";
 import { ActiveFileActions } from "../reducers/activeFileActions";
 import { getPathComponents } from "../util";
-
-export const StateContext = createContext({
-    isLoading: false,
-    setLoading: (loading: boolean) => {},
-});
+import { LoadingContext } from "../contexts/LoadingContext";
 
 type AlbumProps = RouteComponentProps & {
     root?: boolean;
@@ -32,9 +22,10 @@ function Album(props: AlbumProps) {
     const path = usePathComponents();
 
     const [isDirectLink, setIsDirectLink] = useState(path.file !== null);
+    const [isLoading, setIsLoading] = useState(false);
 
     // Also returns response but not really needed now
-    const { files, isLoading, error } = useAlbumApi(path);
+    const { files, error } = useAlbumApi(path, setIsLoading);
     const [activeFileState, dispatch] = useReducer(activeFileReducer, {
         album: path.album,
         albumSize: -1,
@@ -167,7 +158,7 @@ function Album(props: AlbumProps) {
     }, [isDirectLink, activeFileState, files, history]);
 
     return (
-        <div>
+        <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
             <ProgressBar isAnimating={isLoading} />
             {error && <p>Failed to fetch images</p>}
             <div id="image-list" ref={layoutRef}>
@@ -192,7 +183,7 @@ function Album(props: AlbumProps) {
                     ))}
                 </JustifiedLayout>
             </div>
-        </div>
+        </LoadingContext.Provider>
     );
 }
 

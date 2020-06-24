@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { fetchAlbumData } from "../util";
 import { PathComponents, DirectoryListing } from "../types";
 
-function useAlbumApi(path: PathComponents) {
+function useAlbumApi(
+    path: PathComponents,
+    setIsLoading: (loading: boolean) => void
+) {
     const [response, setResponse] = useState<DirectoryListing | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
     // Only run this effect if album/file changes
@@ -26,12 +28,11 @@ function useAlbumApi(path: PathComponents) {
 
         // Get album data from api if new album
         fetchData();
-    }, [path.album]);
+    }, [path.album, setIsLoading]);
 
     return {
         files: response?.files || [],
         response,
-        isLoading,
         error,
     };
 }
