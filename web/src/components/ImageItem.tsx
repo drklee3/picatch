@@ -28,11 +28,16 @@ function ImageItem({
     const src = getPhotoUrl(pathComponents, item, ImageSize.Medium);
     const largeSrc = getPhotoUrl(pathComponents, item, ImageSize.Large);
 
-    const { setIsLoading } = useContext(LoadingContext);
+    const { isLoading, setIsLoading } = useContext(LoadingContext);
 
     function updateActiveFile() {
         // If already active, set to none
         if (active) {
+            // Turn off loading
+            if (isLoading) {
+                setIsLoading(false);
+            }
+
             dispatch({
                 type: ActiveFileActions.SET_FILE,
                 name: "",
