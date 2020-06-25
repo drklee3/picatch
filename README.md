@@ -44,13 +44,17 @@ Minimal photo gallery based on directory structure without a database. Utilizes
 Docker images are provided via both [Docker Hub][docker-hub] and [GitHub
 Packages][github-packages].
 
-**Note:** If you are downloading from GitHub Packages, first [authenticate with
-GitHub Packages][github-package-auth] by creating a personal access token with
-at least the `read:packages` scope.
+**Note:** If you are downloading from GitHub Packages, you will need to first
+[authenticate with GitHub Packages][github-package-auth] by creating a personal
+access token with at least the `read:packages` scope.
 
 To download from GitHub Packages instead of Docker Hub, replace the following
 instances of `drklee3/picatch` with
 `docker.pkg.github.com/drklee3/picatch/picatch`
+
+The `latest` and `stable` tags provide the most recent version tagged image. To
+run the most recent image built from the git master branch, use the Docker image
+tag `master`.
 
 To run picatch with `docker run`
 
@@ -66,12 +70,12 @@ Alternatively with `docker-compose`
 ```yml
 version: "3"
 services:
-  picatch:
-    image: drklee3/picatch
-    ports:
-      - "8080:8080"
-    volumes:
-      - /path/to/your/photos:/photos
+    picatch:
+        image: drklee3/picatch
+        ports:
+            - "8080:8080"
+        volumes:
+            - /path/to/your/photos:/photos
 ```
 
 ### via binary
@@ -190,12 +194,12 @@ env PICATCH_ORIGINAL_PHOTOS_DIR=./photos \
 
 #### Backend
 
-- [Rust](https://www.rust-lang.org/tools/install) version 1.40.0+
+-   [Rust](https://www.rust-lang.org/tools/install) version 1.40.0+
 
 #### Frontend
 
-- Node.js
-- Yarn
+-   Node.js
+-   Yarn
 
 ### Building
 
