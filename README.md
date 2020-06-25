@@ -1,7 +1,7 @@
 # picatch <!-- omit in toc -->
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/drklee3/picatch/Docker?style=flat-square)][github-workflow-docker]
-[![Docker Image Size (tag)](https://img.shields.io/docker/image-size/drklee3/picatch/latest?style=flat-square)][docker-hub]
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/drklee3/picatch/Docker?style=flat)][github-workflow-docker]
+[![Docker Image Size (tag)](https://img.shields.io/docker/image-size/drklee3/picatch/latest?style=flat)][docker-hub]
 
 ![picatch logo](./logo.png)
 
