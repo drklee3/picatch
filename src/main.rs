@@ -3,13 +3,15 @@ extern crate log;
 
 use actix_cors::Cors;
 use actix_files;
-use actix_web::{middleware, web, App, HttpServer};
+use actix_web::{http::Method, middleware, web, App, HttpResponse, HttpServer};
 use dotenv;
 use std::process;
 
 use picatch_lib::{
-    error::Result, filesystem::{utils::verify_directories_exist, background}, model::config::AppConfig, routes,
-    utils,
+    error::Result,
+    filesystem::{background, utils::verify_directories_exist},
+    model::config::AppConfig,
+    routes, utils,
 };
 
 #[actix_rt::main]
@@ -46,13 +48,7 @@ async fn run() -> Result<()> {
         App::new()
             .data(web::JsonConfig::default().limit(4096))
             .data(config_clone.clone())
-            .wrap(
-                Cors::new()
-                    .send_wildcard()
-                    .allowed_methods(vec!["GET", "POST"])
-                    .max_age(3600)
-                    .finish(),
-            )
+            .wrap(Cors::new().send_wildcard().max_age(3600).finish())
             .wrap(middleware::Compress::default())
             // enable logger - register logger last!
             .wrap(middleware::Logger::default())
@@ -70,7 +66,11 @@ async fn run() -> Result<()> {
                 "/photo_sized/",
                 &config_clone.resized_photos_dir,
             ))
-            .service(web::resource("/{path:.*}").route(web::get().to(routes::static_files::path)))
+            .service(
+                web::resource("/{path:.*}")
+                    .route(web::get().to(routes::static_files::path))
+                    .route(web::head().to(|| HttpResponse::Ok())),
+            )
     })
     .bind(format!("{}:{}", &config.interface, &config.port))?
     .run()
