@@ -1,3 +1,8 @@
+.header-count {
+    color: $text-color-dark;
+    font-weight: 400;
+}
+
 #album-list {
     display: flex;
 }
@@ -56,6 +61,7 @@
 
 .img-wrapper {
     height: 100%;
+    cursor: pointer;
 
     .img-placeholder {
         width: 100%;

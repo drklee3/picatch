@@ -162,7 +162,15 @@ function Album(props: AlbumProps) {
         <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
             <ProgressBar isAnimating={isLoading} />
             {error && <p>Failed to fetch images</p>}
-            {albums.length > 0 && <h4>Albums</h4>}
+            {albums.length > 0 && (
+                <h4>
+                    Albums{" "}
+                    <span className="header-count">
+                        ({albums.length}{" "}
+                        {albums.length > 1 ? "albums" : "album"})
+                    </span>
+                </h4>
+            )}
             <div id="album-list">
                 {albums.map((a, i) => (
                     <AlbumItem
@@ -173,7 +181,14 @@ function Album(props: AlbumProps) {
                     />
                 ))}
             </div>
-            {files.length > 0 && <h4>Photos</h4>}
+            {files.length > 0 && (
+                <h4>
+                    Photos{" "}
+                    <span className="header-count">
+                        ({files.length} {files.length > 1 ? "photos" : "photo"})
+                    </span>
+                </h4>
+            )}
             <div id="image-list" ref={layoutRef}>
                 <JustifiedLayout containerWidth={width} containerPadding={0}>
                     {files.map((f, i) => (
