@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { PathComponents, DirectoryItem } from "../types";
+import { PathComponents, DirectoryFile } from "../types";
 
-function useActiveFile(path: PathComponents, files: DirectoryItem[]) {
+function useActiveFile(path: PathComponents, files: DirectoryFile[]) {
     const [activeFileIndex, setActiveFileIndex] = useState(-1);
 
     useEffect(() => {

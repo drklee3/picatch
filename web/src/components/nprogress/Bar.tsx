@@ -14,7 +14,7 @@ const Bar = ({ progress, animationDuration }: BarProps) => (
             marginLeft: `${(-1 + progress) * 100}%`,
             position: "fixed",
             top: 0,
-            transition: `margin-left ${animationDuration}ms linear`,
+            transition: `margin-left ${animationDuration}ms ease-out`,
             width: "100%",
             zIndex: 1031,
         }}

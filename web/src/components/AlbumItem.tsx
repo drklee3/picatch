@@ -1,25 +1,56 @@
 import React from "react";
-import ImageItem from "./ImageItem";
-import DirItem from "./DirItem";
-import { PathComponents, DirectoryItem, DirectoryItemType } from "../types";
-import { ActiveFileState } from "../reducers/activeFileReducer";
+import { ActiveFileActions } from "../reducers/activeFileActions";
+import { getPhotoUrl } from "../util";
+import LazyLoad from "react-lazyload";
+import Image from "./Image";
+import { ImageSize } from "../constants";
+import { PathComponents, DirectoryAlbum } from "../types";
 import { ActiveFileActionTypes } from "../reducers/activeFileActions";
 
-export type AlbumItemProps = {
-    active: boolean;
+interface AlbumItemProps {
     pathComponents: PathComponents;
-    item: DirectoryItem;
+    album: DirectoryAlbum;
     dispatch: React.Dispatch<ActiveFileActionTypes>;
-    activeFileState: ActiveFileState;
-    index: number;
-};
+}
 
-function AlbumItem(props: AlbumItemProps) {
-    if (props.item.type === DirectoryItemType.File) {
-        return <ImageItem {...props} />;
+function AlbumItem({ pathComponents, album, dispatch }: AlbumItemProps) {
+    const src = getPhotoUrl(pathComponents, album, ImageSize.Medium);
+
+    // TODO: Fix this, redirects to / right after click
+    function goToAlbum() {
+        let newAlbumPath = pathComponents.album + album.name;
+
+        if (newAlbumPath.length > 0 && !newAlbumPath.startsWith("/album/")) {
+            newAlbumPath = "/album" + newAlbumPath;
+        }
+
+        dispatch({
+            type: ActiveFileActions.SET_ALBUM,
+            album: newAlbumPath,
+        });
     }
 
-    return <DirItem {...props} />;
+    return (
+        <div className="album-wrapper" onClick={() => goToAlbum()}>
+            <div className="album-text">
+                <p className="album-name">{album.name}</p>
+                <p className="album-description">{album.info?.description}</p>
+            </div>
+            <LazyLoad
+                height="100%"
+                offset={100}
+                overflow={true}
+                placeholder={<div className="album-placeholder" />}
+            >
+                <div className="album-thumbnail-background" />
+                <Image
+                    src={src}
+                    alt={album.name}
+                    className="album-thumbnail invisible"
+                />
+            </LazyLoad>
+        </div>
+    );
 }
 
 export default AlbumItem;

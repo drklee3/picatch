@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useReducer } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
 import JustifiedLayout from "./JustifiedLayout";
 import AlbumItem from "./AlbumItem";
+import ImageItem from "./ImageItem";
 import ProgressBar from "./nprogress/ProgressBar";
 import { HistoryState } from "../types";
 import usePathComponents from "../hooks/usePathComponents";
@@ -25,7 +26,7 @@ function Album(props: AlbumProps) {
     const [isLoading, setIsLoading] = useState(false);
 
     // Also returns response but not really needed now
-    const { files, error } = useAlbumApi(path, setIsLoading);
+    const { albums, files, error } = useAlbumApi(path, setIsLoading);
     const [activeFileState, dispatch] = useReducer(activeFileReducer, {
         album: path.album,
         albumSize: -1,
@@ -161,6 +162,18 @@ function Album(props: AlbumProps) {
         <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
             <ProgressBar isAnimating={isLoading} />
             {error && <p>Failed to fetch images</p>}
+            {albums.length > 0 && <h4>Albums</h4>}
+            <div id="album-list">
+                {albums.map((a, i) => (
+                    <AlbumItem
+                        album={a}
+                        key={i}
+                        pathComponents={path}
+                        dispatch={dispatch}
+                    />
+                ))}
+            </div>
+            {files.length > 0 && <h4>Photos</h4>}
             <div id="image-list" ref={layoutRef}>
                 <JustifiedLayout containerWidth={width} containerPadding={0}>
                     {files.map((f, i) => (
@@ -171,7 +184,7 @@ function Album(props: AlbumProps) {
                             }}
                             key={f.name}
                         >
-                            <AlbumItem
+                            <ImageItem
                                 pathComponents={path}
                                 active={activeFileState.index === i}
                                 activeFileState={activeFileState}

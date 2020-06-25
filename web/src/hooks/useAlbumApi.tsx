@@ -6,7 +6,10 @@ function useAlbumApi(
     path: PathComponents,
     setIsLoading: (loading: boolean) => void
 ) {
-    const [response, setResponse] = useState<DirectoryListing | null>(null);
+    const [
+        directoryListing,
+        setDirectoryListing,
+    ] = useState<DirectoryListing | null>(null);
     const [error, setError] = useState<Error | null>(null);
 
     // Only run this effect if album/file changes
@@ -18,7 +21,7 @@ function useAlbumApi(
             try {
                 // Fetch album data
                 const dirListing = await fetchAlbumData(path.album);
-                setResponse(dirListing);
+                setDirectoryListing(dirListing);
             } catch (e) {
                 console.error("Failed to fetch album data:", e);
                 setError(e);
@@ -31,8 +34,9 @@ function useAlbumApi(
     }, [path.album, setIsLoading]);
 
     return {
-        files: response?.files || [],
-        response,
+        directoryListing,
+        files: directoryListing?.files || [],
+        albums: directoryListing?.albums || [],
         error,
     };
 }

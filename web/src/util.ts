@@ -4,7 +4,12 @@ import {
     RESIZED_IMAGE_BASE_URL,
     ImageSize,
 } from "./constants";
-import { PathComponents, DirectoryListing, DirectoryItem } from "./types";
+import {
+    PathComponents,
+    DirectoryListing,
+    DirectoryAlbum,
+    DirectoryFile,
+} from "./types";
 
 export async function fetchAlbumData(
     pathAlbum: PathComponents["album"]
@@ -13,22 +18,35 @@ export async function fetchAlbumData(
     return res.json();
 }
 
+function isAlbum(file: DirectoryAlbum | DirectoryFile): file is DirectoryAlbum {
+    return (file as DirectoryAlbum).info !== undefined;
+}
+
 export function getPhotoUrl(
     pathComp: PathComponents,
-    item: DirectoryItem,
+    item: DirectoryAlbum | DirectoryFile,
     size: ImageSize
 ) {
-    let dotIndex = item.name.lastIndexOf(".");
-    let fileName = item.name.slice(0, dotIndex);
-    let fileExtension = item.name.slice(dotIndex + 1);
+    let itemName = item.name;
+    let albumCoverPath = "";
+
+    if (isAlbum(item) && item.info?.cover) {
+        // Use cover item name if this is an album
+        itemName = item.info.cover;
+        albumCoverPath = item.name;
+    }
+
+    let dotIndex = itemName.lastIndexOf(".");
+    let fileName = itemName.slice(0, dotIndex);
+    let fileExtension = itemName.slice(dotIndex + 1);
 
     let baseUrl =
         size === ImageSize.Original ? IMAGE_BASE_URL : RESIZED_IMAGE_BASE_URL;
 
-    return `${baseUrl}${pathComp.album}${fileName}-${size}.${fileExtension}`;
+    return `${baseUrl}${pathComp.album}${albumCoverPath}${fileName}-${size}.${fileExtension}`;
 }
 
-export function imageIsActive(pathComp: PathComponents, item: DirectoryItem) {
+export function imageIsActive(pathComp: PathComponents, item: DirectoryFile) {
     return pathComp.file === item.name;
 }
 

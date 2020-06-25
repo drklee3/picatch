@@ -1,5 +1,4 @@
-use serde::Serialize;
-use std::cmp::Ord;
+use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
 #[derive(Debug, Serialize)]
@@ -8,15 +7,25 @@ pub struct ImageDimensions {
     pub height: u32,
 }
 
-#[derive(Debug, Serialize, PartialEq, Eq, PartialOrd, Ord)]
-pub enum DirectoryItemType {
-    Dir,
-    File,
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct AlbumInfo {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cover: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
-pub struct DirectoryItem {
-    pub r#type: DirectoryItemType,
+pub struct DirectoryAlbum {
+    pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub info: Option<AlbumInfo>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct DirectoryFile {
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -29,5 +38,6 @@ pub struct DirectoryItem {
 #[derive(Debug, Serialize)]
 pub struct DirectoryListing {
     pub current: String,
-    pub files: Vec<DirectoryItem>,
+    pub albums: Vec<DirectoryAlbum>,
+    pub files: Vec<DirectoryFile>,
 }

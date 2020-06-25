@@ -1,11 +1,22 @@
 import React, { useContext } from "react";
 import LazyLoad from "react-lazyload";
-import { AlbumItemProps } from "./AlbumItem";
 import Image from "./Image";
 import { getPhotoUrl } from "../util";
 import { ActiveFileActions } from "../reducers/activeFileActions";
 import { ImageSize } from "../constants";
 import { LoadingContext } from "../contexts/LoadingContext";
+import { PathComponents, DirectoryFile } from "../types";
+import { ActiveFileState } from "../reducers/activeFileReducer";
+import { ActiveFileActionTypes } from "../reducers/activeFileActions";
+
+interface ImageItemProps {
+    active: boolean;
+    pathComponents: PathComponents;
+    item: DirectoryFile;
+    dispatch: React.Dispatch<ActiveFileActionTypes>;
+    activeFileState: ActiveFileState;
+    index: number;
+}
 
 function ImageItem({
     active,
@@ -13,7 +24,7 @@ function ImageItem({
     item,
     index,
     dispatch,
-}: AlbumItemProps) {
+}: ImageItemProps) {
     const src = getPhotoUrl(pathComponents, item, ImageSize.Medium);
     const largeSrc = getPhotoUrl(pathComponents, item, ImageSize.Large);
 
