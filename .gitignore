@@ -4,7 +4,8 @@
 config.toml
 
 /photos/
-**/test_photos_resized
+tests/test_photos_resized/*
+!tests/test_photos_resized/.gitkeep
 /photos_resized/
 notes.md
 logo.psd
