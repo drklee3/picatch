@@ -8,6 +8,12 @@ header {
     }
 
     h3 {
+        display: inline-block;
         margin: 0;
+        cursor: pointer;
+
+        &:hover {
+            color: $link-color;
+        }
     }
 }
