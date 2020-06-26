@@ -9,6 +9,8 @@ RUN yarn
 
 # copy source
 COPY ./web/ ./
+
+RUN yarn test
 RUN yarn build
 
 ## Compile actix-web server
@@ -32,15 +34,20 @@ RUN rm src/*.rs
 # copy source tree
 COPY ./src ./src
 
+# copy test files
+COPY ./tests ./tests
+
 # copy built static react files
 RUN mkdir -p ./web/build
 COPY --from=front /web/build ./web/build
 
 # build for release, remove dummy compiled files **including libpicatch**
 RUN rm ./target/release/deps/*picatch*
+
+RUN cargo test --release
 RUN cargo build --release
 
-## Final base image
+## Final base image with only the picatch binary
 FROM debian:buster-slim
 COPY --from=back /picatch_source/target/release/picatch /picatch
 
