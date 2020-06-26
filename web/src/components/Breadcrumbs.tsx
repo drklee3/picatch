@@ -12,7 +12,11 @@ export interface BreadcrumbsProps {
 function AlbumBreadcrumbs({ pathComponents, dispatch }: BreadcrumbsProps) {
     const paths = getBreadcrumbsAlbumPaths(pathComponents);
 
-    function goToAlbum(album: string) {
+    function goToAlbum(album: string | null) {
+        if (album === null) {
+            return;
+        }
+
         dispatch({
             type: ActiveFileActions.SET_ALBUM,
             album: album,
@@ -23,7 +27,9 @@ function AlbumBreadcrumbs({ pathComponents, dispatch }: BreadcrumbsProps) {
         <ul id="breadcrumbs-wrapper">
             {paths.map((breadcrumb, i) => (
                 <li
-                    className="breadcrumb"
+                    className={`breadcrumb ${
+                        breadcrumb.name === "..." ? "breadcrumb-ellipsis" : ""
+                    }`}
                     key={i}
                     onClick={() => goToAlbum(breadcrumb.path)}
                 >

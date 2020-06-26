@@ -7,7 +7,7 @@ describe("getParentAlbumPath", () => {
             album: "/",
         });
 
-        expect(parent).toEqual([{ name: "home", path: "/" }]);
+        expect(parent).toEqual([]);
     });
 
     it("should return parent album", () => {
@@ -17,7 +17,6 @@ describe("getParentAlbumPath", () => {
         });
 
         expect(parent).toEqual([
-            { name: "home", path: "/" },
             { name: "some", path: "/album/some/" },
             { name: "dir", path: "/album/some/dir/" },
         ]);
@@ -26,13 +25,27 @@ describe("getParentAlbumPath", () => {
     it("should return nested parent album", () => {
         const parent = getBreadcrumbsAlbumPaths({
             file: "",
-            album: "/some/dir/nested",
+            album: "/some/dir/nested/",
         });
 
         expect(parent).toEqual([
-            { name: "home", path: "/" },
+            { name: "some", path: "/album/some/" },
             { name: "dir", path: "/album/some/dir/" },
             { name: "nested", path: "/album/some/dir/nested/" },
+        ]);
+    });
+
+    it("should return max 3 breadcrumbs", () => {
+        const parent = getBreadcrumbsAlbumPaths({
+            file: "",
+            album: "/some/dir/nested/really/deep/",
+        });
+
+        expect(parent).toEqual([
+            { name: "...", path: null },
+            { name: "nested", path: "/album/some/dir/nested/" },
+            { name: "really", path: "/album/some/dir/nested/really/" },
+            { name: "deep", path: "/album/some/dir/nested/really/deep/" },
         ]);
     });
 });

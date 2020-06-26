@@ -10,7 +10,7 @@
     .breadcrumb {
         p {
             cursor: pointer;
-            margin: 5px 20px;
+            margin: 5px 10px;
             display: inline-block;
             color: $link-color;
 
@@ -28,6 +28,12 @@
             color: inherit;
             // color: $text-color-dark;
             padding-right: 0;
+            text-decoration: none;
+        }
+
+        &.breadcrumb-ellipsis p {
+            color: inherit;
+            cursor: default;
             text-decoration: none;
         }
 
