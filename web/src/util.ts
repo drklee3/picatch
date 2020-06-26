@@ -73,16 +73,13 @@ export function getImageName(path: string) {
  * Gets current path's album and image if available
  */
 export function getPathComponents(path: string): PathComponents {
-    let root = "";
     if (path.startsWith("/album")) {
-        root = "/album";
         path = path.replace("/album", "");
     }
 
     // If trailing "/" then we on album
     if (path.endsWith("/")) {
         return {
-            root,
             album: path,
             file: null,
         };
@@ -101,7 +98,6 @@ export function getPathComponents(path: string): PathComponents {
     }
 
     return {
-        root,
         album: path,
         file: imageName,
     };

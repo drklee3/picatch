@@ -1,4 +1,4 @@
-import { getImageName, getPathComponents } from "./util";
+import { getPathComponents } from "./util";
 
 const paths = [
     {
