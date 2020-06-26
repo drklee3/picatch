@@ -3,6 +3,7 @@ import { RouteComponentProps, useHistory } from "react-router";
 import JustifiedLayout from "./JustifiedLayout";
 import AlbumItem from "./AlbumItem";
 import ImageItem from "./ImageItem";
+import Header from "./Header";
 import ProgressBar from "./nprogress/ProgressBar";
 import { HistoryState } from "../types";
 import usePathComponents from "../hooks/usePathComponents";
@@ -161,6 +162,7 @@ function Album(props: AlbumProps) {
     return (
         <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
             <ProgressBar isAnimating={isLoading} />
+            <Header pathComponents={path} dispatch={dispatch} />
             {error && <p>Failed to fetch images</p>}
             {albums.length > 0 && (
                 <h4>

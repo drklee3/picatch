@@ -10,7 +10,6 @@ function App() {
     return (
         <Router>
             <div className="container">
-                <Header />
                 <Switch>
                     <Route
                         path="/album/:albumPath+"

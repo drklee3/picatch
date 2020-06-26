@@ -1,0 +1,39 @@
+#breadcrumbs-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    .breadcrumb {
+        p {
+            cursor: pointer;
+            margin: 5px 20px;
+            display: inline-block;
+            color: $link-color;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        &:first-child p {
+            padding-left: 0;
+        }
+
+        &:last-child p {
+            cursor: default;
+            color: inherit;
+            // color: $text-color-dark;
+            padding-right: 0;
+            text-decoration: none;
+        }
+
+        // Slash in between each album
+        + ::before {
+            content: "/";
+        }
+    }
+}

@@ -1,5 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Lato:wght@100;400;700&display=swap");
 
+html {
+    // Keep scrollbar, avoid width changes
+    overflow-y: scroll;
+}
+
 body {
     background-color: $bg-color;
     color: $text-color;
@@ -13,6 +18,10 @@ strong {
 a {
     color: $link-color;
     text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
 }
 
 .container {
