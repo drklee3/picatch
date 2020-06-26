@@ -1,7 +1,8 @@
 # picatch <!-- omit in toc -->
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/drklee3/picatch/Docker?style=flat)][github-workflow-docker]
-[![Docker Image Size (tag)](https://img.shields.io/docker/image-size/drklee3/picatch/latest?style=flat)][docker-hub]
+[![GitHub Workflow Status][github-workflow-docker-img]][github-workflow-docker]
+[![Docker Image Size (tag)][docker-hub-img]][docker-hub]
+[![Master Demo][demo-master-img]][demo-master]
 
 ![picatch logo](./logo.png)
 
@@ -15,6 +16,12 @@ Minimal photo gallery based on directory structure without a database. Utilizes
   <summary>(picatch: pic + catch)</summary>
   Why catch? It... catches pictures in a folder? uhh I don't really know
 </details>
+
+## Demo <!-- omit in toc -->
+
+[stable][demo-stable] (Last version tagged)
+
+[master][demo-master] (Built from master branch)
 
 ## Table of Contents <!-- omit in toc -->
 
@@ -246,8 +253,14 @@ the files are correctly embedded.
 MIT.
 
 [actix-web]: https://github.com/actix/actix-web
+[demo-master]: https://master.dlee.photo
+[demo-master-img]: https://img.shields.io/website?down_color=red&down_message=offline&label=demo%20%28master%29&up_color=blue&up_message=online&url=https%3A%2F%2Fmaster.dlee.photo
+[demo-stable]: https://dlee.photo
+[demo-stable-img]: https://img.shields.io/website?down_color=red&down_message=offline&label=demo%20%28stable%29&up_color=blue&up_message=online&url=https%3A%2F%2Fdlee.photo
 [docker-hub]: https://hub.docker.com/repository/docker/drklee3/picatch
+[docker-hub-img]: https://img.shields.io/docker/image-size/drklee3/picatch/master?style=flat
 [github-workflow-ci]: https://github.com/drklee3/picatch/actions?query=workflow%3ACI
+[github-workflow-docker-img]: https://img.shields.io/github/workflow/status/drklee3/picatch/Docker?style=flat
 [github-workflow-docker]: https://github.com/drklee3/picatch/actions?query=workflow%3ADocker
 [github-package-auth]: https://help.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-docker-for-use-with-github-packages#authenticating-to-github-packages
 [github-packages]: https://github.com/drklee3/picatch/packages
