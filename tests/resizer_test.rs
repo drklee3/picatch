@@ -1,13 +1,13 @@
+use num_cpus;
 use picatch_lib::{
-    filesystem::{utils, background},
+    filesystem::{background, utils},
     model::{
         config::{AppConfig, PubConfig},
         ImageSize, ResizeOptions,
     },
-    utils::logging
+    utils::logging,
 };
 use std::{fs::remove_dir_all, path::Path};
-use num_cpus;
 use threadpool::ThreadPool;
 
 #[test]
@@ -28,8 +28,8 @@ fn builds_resized_file_path() {
         ImageSize::Large.into(),
     ];
 
-    // Clear resized dir before resizing
-    remove_dir_all(&config.resized_photos_dir).unwrap();
+    // Clear resized dir before resizing, ignore error since the dir doesn't exist on git repo
+    let _ = remove_dir_all(&config.resized_photos_dir);
     utils::verify_directories_exist(vec![
         &config.original_photos_dir,
         &config.resized_photos_dir,
