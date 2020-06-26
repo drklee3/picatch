@@ -18,14 +18,17 @@ fn directory_api_lists_files() {
 
     let listing = get_dir_listing("".into(), &config).unwrap();
 
-    assert_eq!(3, listing.files.len());
+    assert_eq!(2, listing.files.len());
+    assert_eq!(1, listing.albums.len());
 
-    let test_album = listing.files[0].album.clone().unwrap();
+    let test_album = listing.albums[0].clone();
     println!("Album: {:?}", &test_album);
+
+    let album_info = test_album.info.unwrap();
 
     assert_eq!(
         Some("a test album description".to_string()),
-        test_album.description
+        album_info.description
     );
-    assert_eq!(Some("DSC_5644.jpg".to_string()), test_album.cover);
+    assert_eq!(Some("DSC_5644.jpg".to_string()), album_info.cover);
 }

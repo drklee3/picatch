@@ -16,7 +16,7 @@ pub struct AlbumInfo {
     pub cover: Option<String>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct DirectoryAlbum {
     pub name: String,
 
