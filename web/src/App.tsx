@@ -4,7 +4,6 @@ import "./styles/index.scss";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Album from "./components/Album";
 import Footer from "./components/Footer";
-import Header from "./components/Header";
 
 function App() {
     return (
