@@ -33,7 +33,7 @@ function AlbumItem({ pathComponents, album, dispatch }: AlbumItemProps) {
     return (
         <div className="album-wrapper" onClick={goToAlbum}>
             <div className="album-text">
-                <p className="album-name">{album.name}</p>
+                <h4 className="album-name">{album.name.slice(0, -1)}</h4>
                 <p className="album-description">{album.info?.description}</p>
             </div>
             <LazyLoad
