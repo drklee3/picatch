@@ -1,6 +1,7 @@
 import { ActiveFileActions, ActiveFileActionTypes } from "./activeFileActions";
 
 export type ActiveFileState = {
+    // This *does* include the browser's "/album" prefix
     album: string;
     albumSize: number;
     name: string;

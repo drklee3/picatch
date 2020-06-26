@@ -31,7 +31,7 @@ function AlbumItem({ pathComponents, album, dispatch }: AlbumItemProps) {
     }
 
     return (
-        <div className="album-wrapper" onClick={() => goToAlbum()}>
+        <div className="album-wrapper" onClick={goToAlbum}>
             <div className="album-text">
                 <p className="album-name">{album.name}</p>
                 <p className="album-description">{album.info?.description}</p>

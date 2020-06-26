@@ -1,4 +1,5 @@
 export interface PathComponents {
+    // Does *not* include the browser's "/album" prefix
     album: string;
     file: string | null;
 }
