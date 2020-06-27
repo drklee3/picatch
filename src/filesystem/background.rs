@@ -1,12 +1,16 @@
 use crate::{
     error::Result,
-    filesystem::{resizer::resize_images, utils},
+    filesystem::{
+        resizer::resize_images,
+        utils,
+        watcher::{get_watcher_event_action, FileAction},
+    },
     model::{config::AppConfig, ImageSize, ResizeOptions},
 };
-use notify::{watcher, RecursiveMode, Watcher};
+use notify::{watcher, DebouncedEvent, RecursiveMode, Watcher};
 use num_cpus;
-use std::collections::HashSet;
-use std::fs::remove_file;
+use same_file::is_same_file;
+use std::fs::{remove_file, rename};
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::channel;
 use std::thread;
@@ -16,19 +20,19 @@ use threadpool::ThreadPool;
 pub fn startup_resize(
     pool: &ThreadPool,
     config: &AppConfig,
-    opts_list: Vec<ResizeOptions>,
+    opts_list: &Vec<ResizeOptions>,
 ) -> Result<()> {
+    // These two do NOT include "./" prefix if original/resized_photos_dir doesn't start with "./"
     let source_files = utils::get_all_files(Path::new(&config.original_photos_dir))?;
     let resized_files = utils::get_all_files(Path::new(&config.resized_photos_dir))?;
+
     let jobs = utils::get_files_not_resized(&config, &source_files, &resized_files, opts_list)?;
 
-    let total_jobs = jobs.resize_jobs.iter().fold(0, |acc, (_, v)| acc + v.len());
-
-    if total_jobs > 0 {
+    if jobs.resize_jobs.len() > 0 {
         info!(
             "{} source images to resize (total {} resized files)",
             jobs.resize_jobs.len(),
-            total_jobs
+            jobs.total_resized_files,
         );
     } else {
         info!("Resized images up to date");
@@ -43,17 +47,39 @@ pub fn startup_resize(
         );
     }
 
-    remove_stale_files(jobs.stale_resized_files)?;
+    remove_files(jobs.stale_resized_files.into_iter());
 
     Ok(())
 }
 
-fn remove_stale_files(paths: HashSet<PathBuf>) -> Result<()> {
+/// Delete all files from an iterator
+fn remove_files<I>(paths: I)
+where
+    I: Iterator<Item = PathBuf>,
+{
     for path in paths {
-        remove_file(&path)?;
+        if let Err(e) = remove_file(&path) {
+            warn!("Failed to remove file {}: {}", path.to_string_lossy(), e);
+        }
     }
+}
 
-    Ok(())
+/// Rename list of files to list of destinations
+/// assumes the two vecs are 1 to 1 sorted
+fn rename_files(source_paths: Vec<PathBuf>, dest_paths: Vec<PathBuf>) {
+    source_paths
+        .iter()
+        .zip(dest_paths.iter())
+        .for_each(|(source, dest)| {
+            if let Err(e) = rename(source, dest) {
+                warn!(
+                    "Failed to rename file {} -> {}: {}",
+                    source.to_string_lossy(),
+                    dest.to_string_lossy(),
+                    e
+                );
+            }
+        });
 }
 
 fn resizer_thread(config: AppConfig) {
@@ -75,7 +101,7 @@ fn run_resizer_thread(config: AppConfig) -> Result<()> {
     ];
     // Scan on startup
     info!("Scanning for pending resizes");
-    startup_resize(&pool, &config, opts_list)?;
+    startup_resize(&pool, &config, &opts_list)?;
 
     // Create a channel to receive the events.
     let (tx, rx) = channel();
@@ -90,10 +116,97 @@ fn run_resizer_thread(config: AppConfig) -> Result<()> {
 
     loop {
         match rx.recv() {
-            Ok(event) => println!("{:?}", event),
-            Err(e) => warn!("watch error: {:?}", e),
+            Ok(event) => {
+                debug!("New fs event: {:?}", &event);
+
+                // Don't return if error, just keep watching future events
+                if let Err(e) = handle_fs_event(&config, &opts_list, &pool, &event) {
+                    error!("Failed to handle file event {:?}: {}", event, e);
+                }
+            }
+            Err(e) => warn!("Watch error: {:?}", e),
         }
     }
+}
+
+fn handle_fs_event(
+    config: &AppConfig,
+    opts_list: &Vec<ResizeOptions>,
+    pool: &ThreadPool,
+    event: &DebouncedEvent,
+) -> Result<()> {
+    let action = match get_watcher_event_action(event) {
+        Some(a) => a,
+        None => return Ok(()), // Some NoticeWrite/Remove etc event we don't care about
+    };
+
+    // Ignore Write event for directory
+    // Modifying "/path/to/photos/img.jpg" will also send a Write to "/path/to/photos"
+
+    match action {
+        // New file, resize all files
+        FileAction::Resize(path) => {
+            // Skip Write events on base original_photos_dir (file contained modified)
+            if path.is_dir() && is_same_file(&config.original_photos_dir, &path)? {
+                debug!("Write event on original_photos_dir, skipping");
+                return Ok(());
+            }
+
+            // If it's a new dir, scan entire folder
+            // TODO: Only scan modified dir, however inconsistent relative paths
+            let jobs = if path.is_dir() {
+                let source_files = utils::get_all_files(Path::new(&config.original_photos_dir))?;
+                let resized_files = utils::get_all_files(Path::new(&config.resized_photos_dir))?;
+
+                utils::get_files_not_resized(config, &source_files, &resized_files, opts_list)?
+            } else {
+                utils::get_files_not_resized(config, &vec![path], &vec![], opts_list)?
+            };
+
+            info!(
+                "{} new source image(s) detected, resizing (total {} resized images)",
+                jobs.resize_jobs.len(),
+                jobs.total_resized_files,
+            );
+            resize_images(pool, jobs.resize_jobs)?;
+        }
+        FileAction::Rename(path, dest) => {
+            // Move directory, only check destination if is dir since source doesn't exist anymore duh
+            if dest.is_dir() {
+                let resized_dir_path = utils::get_resized_dir_path(config, &path)?;
+                let resized_dir_dest = utils::get_resized_dir_path(config, &dest)?;
+
+                if let Err(e) = rename(&resized_dir_path, &resized_dir_dest) {
+                    warn!(
+                        "Failed to rename directory {} -> {}: {}",
+                        path.to_string_lossy(),
+                        dest.to_string_lossy(),
+                        e
+                    );
+                }
+                return Ok(());
+            }
+
+            let source_paths = utils::get_resized_paths(config, &path, opts_list)?;
+            let dest_paths = utils::get_resized_paths(config, &dest, opts_list)?;
+
+            info!(
+                "Rename detected, renaming {} resized images",
+                source_paths.len()
+            );
+
+            rename_files(source_paths, dest_paths);
+        }
+        // Delete all resized files
+        FileAction::Delete(path) => {
+            let paths = utils::get_resized_paths(config, &path, opts_list)?;
+            info!("Delete detected, deleting {} resized images", paths.len());
+
+            remove_files(paths.into_iter());
+        }
+    }
+
+    Ok(())
 }
 
 pub fn start_resizer_thread(config: &AppConfig) {

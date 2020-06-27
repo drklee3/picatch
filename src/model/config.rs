@@ -34,6 +34,8 @@ impl Default for PubConfig {
     }
 }
 
+/// App configuration, ensure dir fields do NOT start with "./"
+/// using AppConfig::new() handles this
 #[derive(PartialEq, Eq, Clone, Debug, Deserialize, Serialize)]
 pub struct AppConfig {
     #[serde(default)]
@@ -67,7 +69,38 @@ impl AppConfig {
         // Eg.. `PICATCH_DEBUG=1 ./target/app` would set the `debug` key
         conf.merge(config::Environment::with_prefix("PICATCH"))?;
 
-        conf.try_into().map_err(Into::into)
+        let mut app_config: Self = conf.try_into()?;
+        app_config.process_paths();
+
+        Ok(app_config)
+    }
+
+    /// Ensures paths do not include "./"
+    pub fn process_paths(&mut self) {
+        self.original_photos_dir = AppConfig::_process_path(&self.original_photos_dir);
+        self.resized_photos_dir = AppConfig::_process_path(&self.resized_photos_dir);
+    }
+
+    /// Remove "./" prefixes from path
+    /// eg: "./photos" -> "photos"
+    fn _process_path(path: &str) -> String {
+        if path.starts_with("./") {
+            return path[2..].to_string();
+        }
+
+        path.into()
+    }
+}
+
+impl Default for AppConfig {
+    fn default() -> Self {
+        AppConfig {
+            public: PubConfig::default(),
+            original_photos_dir: default_original_photos_dir(),
+            resized_photos_dir: default_resized_photos_dir(),
+            interface: default_interface(),
+            port: default_port(),
+        }
     }
 }
 
@@ -84,11 +117,11 @@ fn default_version() -> String {
 }
 
 fn default_original_photos_dir() -> String {
-    "./photos".into()
+    "photos".into()
 }
 
 fn default_resized_photos_dir() -> String {
-    "./photos_resized".into()
+    "photos_resized".into()
 }
 
 fn default_interface() -> String {

@@ -19,8 +19,8 @@ fn builds_resized_file_path() {
 
     let config = AppConfig {
         public: PubConfig::default(),
-        original_photos_dir: "./tests/test_photos".into(),
-        resized_photos_dir: "./tests/test_photos_resized".into(),
+        original_photos_dir: "tests/test_photos".into(),
+        resized_photos_dir: "tests/test_photos_resized".into(),
         interface: "0.0.0.0".into(),
         port: 8080,
     };
@@ -47,7 +47,7 @@ fn builds_resized_file_path() {
     let workers = num_cpus::get();
     let pool = ThreadPool::new(workers);
 
-    background::startup_resize(&pool, &config, opts_list).unwrap();
+    background::startup_resize(&pool, &config, &opts_list).unwrap();
 
     pool.join();
 

@@ -10,8 +10,8 @@ fn it_parses_config_from_file() {
             links: vec![],
             version: env!("CARGO_PKG_VERSION").into(),
         },
-        original_photos_dir: "./photos".into(),
-        resized_photos_dir: "./photos_resized".into(),
+        original_photos_dir: "photos".into(),
+        resized_photos_dir: "photos_resized".into(),
         interface: "0.0.0.0".into(),
         port: 8080,
     };

@@ -3,6 +3,7 @@ use crate::{
     model::{config::AppConfig, ImageSize, ResizeJob, ResizeOptions},
 };
 use std::collections::{HashMap, HashSet};
+use std::env::current_dir;
 use std::fs::{self, create_dir_all};
 use std::iter::FromIterator;
 use std::path::{Path, PathBuf};
@@ -44,48 +45,89 @@ pub fn get_resize_options(sizes: Vec<ImageSize>) -> Vec<ResizeOptions> {
     sizes.into_iter().map(|size| size.into()).collect()
 }
 
+// Converts path in original_photos_dir to a path in resized_photos_dir
+pub fn get_resized_dir_path(config: &AppConfig, path: &Path) -> Result<PathBuf> {
+    // Assumes config paths do NOT have the "./" prefix
+    // Should be handled when creating the config
+    let original_photos_dir = PathBuf::from(&config.original_photos_dir);
+
+    // Resized dir + relative file path + size
+    let mut dest_path = PathBuf::from(&config.resized_photos_dir);
+
+    let cur_dir = {
+        let dir = current_dir()?;
+
+        // Dumb way to add trailing slash, need trailing slash added so the file
+        // path is propperly stripped
+        let mut dir_str = dir.into_os_string();
+        dir_str.push("/");
+
+        PathBuf::from(dir_str)
+    };
+
+    // Watcher paths prepend absolute paths, so remove it here
+    // eg: /mnt/c/.../picatch/./photos/DSC_3328.jpg
+    // We only want the ./photos/DSC_3328.jpg part. We don't need to
+    // canonicalize() path beforehand since doesn't matter if there's an extra
+    // /./ in the middle the /mnt/c/.../picatch/ part will be stripped
+    let path = match path.strip_prefix(cur_dir) {
+        Ok(p) => p,
+        // If stripping cur_dir doesn't work, there's still the "./"
+        Err(_) => path.strip_prefix(".").unwrap_or(path),
+    };
+
+    // If is file, get the parent dir. If dir, don't get parent
+    // This contains original_photos_dir/path/to/dir
+    let source_file_dir = if let Some(ext) = path.extension() {
+        let extension = ext.to_string_lossy().to_lowercase();
+        if extension == "jpg" || extension == "jpeg" {
+            path.parent().ok_or(Error::Picatch(format!(
+                "Path missing parent: {}",
+                path.to_string_lossy()
+            )))?
+        } else {
+            path
+        }
+    } else {
+        path
+    };
+
+    // This is the path to dir *without* the original_photos_dir
+    let file_dir = source_file_dir
+        .strip_prefix(&original_photos_dir)
+        .map_err(|_| {
+            Error::Picatch(format!(
+                "get_resized_dir_path: Failed to strip original_photos_dir from source path: {}",
+                path.to_string_lossy()
+            ))
+        })?;
+
+    dest_path.push(file_dir);
+
+    Ok(dest_path)
+}
+
+// Paths will *not* have "./" prefix
 pub fn get_destination_path(
     config: &AppConfig,
     path: &Path,
     opts: &ResizeOptions,
 ) -> Result<PathBuf> {
-    let img_path_str = path.to_string_lossy();
-    // resized dir + relative file path + size
-    let mut dest_path = PathBuf::from(&config.resized_photos_dir);
+    let mut dest_path = get_resized_dir_path(config, path)?;
 
-    // Just in case, check if path includes original_photos_dir
-    if dest_path.starts_with(&config.original_photos_dir) {
-        dest_path = dest_path
-            .strip_prefix(&config.original_photos_dir)
-            .map_err(|_| Error::Picatch(format!("Failed to strip prefix: {}", img_path_str)))?
-            .to_path_buf();
-    }
-
-    // Get file stem first, in case there isn't a file name provided
     let file_name = path
         .file_stem()
         .ok_or(Error::Picatch(format!(
             "Path missing file name: {}",
-            img_path_str
+            path.to_string_lossy()
         )))?
         .to_string_lossy();
-
-    let file_dir = path
-        .parent()
-        .ok_or(Error::Picatch(format!(
-            "Path missing parent: {}",
-            img_path_str
-        )))?
-        .strip_prefix(&config.original_photos_dir)
-        .map_err(|_| Error::Picatch(format!("Failed to strip prefix: {}", img_path_str)))?;
-
-    dest_path.push(file_dir);
 
     let file_ext = path
         .extension()
         .ok_or(Error::Picatch(format!(
             "Path missing extension: {}",
-            img_path_str
+            path.to_string_lossy()
         )))?
         .to_string_lossy();
 
@@ -99,25 +141,44 @@ pub fn get_destination_path(
 
 pub struct ResizeJobs {
     pub resize_jobs: HashMap<PathBuf, Vec<ResizeJob>>,
+    pub total_resized_files: u64,
 
     // Resized files that don't have a corresponding original image, to be deleted
     pub stale_resized_files: HashSet<PathBuf>,
+}
+
+/// Get the resized image paths from a single original image path
+pub fn get_resized_paths(
+    config: &AppConfig,
+    source: &Path,
+    options_list: &Vec<ResizeOptions>,
+) -> Result<Vec<PathBuf>> {
+    let mut paths = Vec::new();
+
+    for options in options_list {
+        let dest = get_destination_path(&config, &source, &options)?;
+
+        paths.push(dest);
+    }
+
+    Ok(paths)
 }
 
 pub fn get_files_not_resized(
     config: &AppConfig,
     source_files: &Vec<PathBuf>,
     resized_files: &Vec<PathBuf>,
-    options_list: Vec<ResizeOptions>,
+    options_list: &Vec<ResizeOptions>,
 ) -> Result<ResizeJobs> {
     let mut resized_files_set: HashSet<PathBuf> = HashSet::from_iter(resized_files.iter().cloned());
 
     let mut to_resize = HashMap::new();
+    let mut total_resized_files = 0;
 
     for file in source_files {
         let file_jobs = to_resize.entry(file.clone()).or_insert(Vec::new());
 
-        for options in &options_list {
+        for options in options_list {
             let dest = get_destination_path(&config, &file, &options)?;
 
             // Skip already resized files
@@ -135,6 +196,7 @@ pub fn get_files_not_resized(
             };
 
             file_jobs.push(new_job);
+            total_resized_files += 1;
         }
 
         // If none are required, remove empty entry from map
@@ -147,6 +209,7 @@ pub fn get_files_not_resized(
 
     Ok(ResizeJobs {
         resize_jobs: to_resize,
+        total_resized_files,
         stale_resized_files: resized_files_set,
     })
 }
