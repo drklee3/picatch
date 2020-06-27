@@ -48,12 +48,10 @@ function Album(props: AlbumProps) {
     }, [path]);
 
     useEffect(() => {
-        if (files.length !== 0) {
-            dispatch({
-                type: ActiveFileActions.SET_ALBUM_SIZE,
-                albumSize: files.length,
-            });
-        }
+        dispatch({
+            type: ActiveFileActions.SET_ALBUM_SIZE,
+            albumSize: files.length,
+        });
     }, [files]);
 
     // Update activeFile index on direct load
@@ -124,10 +122,6 @@ function Album(props: AlbumProps) {
     useEffect(() => {
         // Skip updating url if directly loading an image
         if (isDirectLink) {
-            return;
-        }
-
-        if (files.length === 0) {
             return;
         }
 
