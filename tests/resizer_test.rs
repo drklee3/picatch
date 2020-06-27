@@ -7,7 +7,10 @@ use picatch_lib::{
     },
     utils::logging,
 };
-use std::{fs::remove_dir_all, path::Path};
+use std::{
+    fs::{remove_dir_all, File},
+    path::Path,
+};
 use threadpool::ThreadPool;
 
 #[test]
@@ -30,11 +33,16 @@ fn builds_resized_file_path() {
 
     // Clear resized dir before resizing, ignore error since the dir doesn't exist on git repo
     let _ = remove_dir_all(&config.resized_photos_dir);
+
     utils::verify_directories_exist(vec![
         &config.original_photos_dir,
         &config.resized_photos_dir,
     ])
     .unwrap();
+
+    // Create some stale files, ensure they don't have same file name as any original files
+    File::create("./tests/test_photos_resized/TEST_0.jpg").unwrap();
+    File::create("./tests/test_photos_resized/TEST_1.jpg").unwrap();
 
     let workers = num_cpus::get();
     let pool = ThreadPool::new(workers);

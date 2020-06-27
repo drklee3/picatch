@@ -97,14 +97,20 @@ pub fn get_destination_path(
     Ok(dest_path)
 }
 
+pub struct ResizeJobs {
+    pub resize_jobs: HashMap<PathBuf, Vec<ResizeJob>>,
+
+    // Resized files that don't have a corresponding original image, to be deleted
+    pub stale_resized_files: HashSet<PathBuf>,
+}
+
 pub fn get_files_not_resized(
     config: &AppConfig,
-    source_files: Vec<PathBuf>,
-    resized_files: Vec<PathBuf>,
+    source_files: &Vec<PathBuf>,
+    resized_files: &Vec<PathBuf>,
     options_list: Vec<ResizeOptions>,
-) -> Result<HashMap<PathBuf, Vec<ResizeJob>>> {
-    // let orig_files = get_all_files(Path::new(&config.original_photos_dir))?;
-    let resized_files: HashSet<PathBuf> = HashSet::from_iter(resized_files);
+) -> Result<ResizeJobs> {
+    let mut resized_files_set: HashSet<PathBuf> = HashSet::from_iter(resized_files.iter().cloned());
 
     let mut to_resize = HashMap::new();
 
@@ -114,7 +120,10 @@ pub fn get_files_not_resized(
         for options in &options_list {
             let dest = get_destination_path(&config, &file, &options)?;
 
-            if resized_files.contains(&dest) {
+            // Skip already resized files
+            if resized_files_set.contains(&dest) {
+                // Remove valid resized file
+                resized_files_set.remove(&dest);
                 continue;
             }
 
@@ -127,9 +136,19 @@ pub fn get_files_not_resized(
 
             file_jobs.push(new_job);
         }
+
+        // If none are required, remove empty entry from map
+        if file_jobs.is_empty() {
+            to_resize.remove(file);
+        }
     }
 
-    Ok(to_resize)
+    // resized_files_set should contain resized files that don't have orig file now
+
+    Ok(ResizeJobs {
+        resize_jobs: to_resize,
+        stale_resized_files: resized_files_set,
+    })
 }
 
 pub fn get_all_files(path: &Path) -> Result<Vec<PathBuf>> {
