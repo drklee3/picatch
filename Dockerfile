@@ -10,7 +10,7 @@ RUN yarn
 # copy source
 COPY ./web/ ./
 
-RUN yarn test
+RUN yarn test --watchAll=false
 RUN yarn build
 
 ## Compile actix-web server
