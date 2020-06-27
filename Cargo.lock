@@ -1347,7 +1347,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "picatch"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "actix-cors 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "actix-files 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
