@@ -47,6 +47,8 @@ pub fn get_resize_options(sizes: Vec<ImageSize>) -> Vec<ResizeOptions> {
 
 // Converts path in original_photos_dir to a path in resized_photos_dir
 pub fn get_resized_dir_path(config: &AppConfig, path: &Path) -> Result<PathBuf> {
+    let path_str = path.to_string_lossy();
+
     // Assumes config paths do NOT have the "./" prefix
     // Should be handled when creating the config
     let original_photos_dir = PathBuf::from(&config.original_photos_dir);
@@ -81,10 +83,8 @@ pub fn get_resized_dir_path(config: &AppConfig, path: &Path) -> Result<PathBuf> 
     let source_file_dir = if let Some(ext) = path.extension() {
         let extension = ext.to_string_lossy().to_lowercase();
         if extension == "jpg" || extension == "jpeg" {
-            path.parent().ok_or(Error::Picatch(format!(
-                "Path missing parent: {}",
-                path.to_string_lossy()
-            )))?
+            path.parent()
+                .ok_or(Error::Picatch(format!("Path missing parent: {}", path_str)))?
         } else {
             path
         }
@@ -92,13 +92,16 @@ pub fn get_resized_dir_path(config: &AppConfig, path: &Path) -> Result<PathBuf> 
         path
     };
 
+    // Path is relative, so we need to handle absolute paths for original_photos_dir
+
     // This is the path to dir *without* the original_photos_dir
     let file_dir = source_file_dir
         .strip_prefix(&original_photos_dir)
         .map_err(|_| {
             Error::Picatch(format!(
-                "get_resized_dir_path: Failed to strip original_photos_dir from source path: {}",
-                path.to_string_lossy()
+                "get_resized_dir_path: Failed to strip original_photos_dir ({}) from source path: {}",
+                original_photos_dir.to_string_lossy(),
+                path_str
             ))
         })?;
 
