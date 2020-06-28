@@ -99,8 +99,9 @@ pub fn get_resized_dir_path(config: &AppConfig, path: &Path) -> Result<PathBuf> 
         .strip_prefix(&original_photos_dir)
         .map_err(|_| {
             Error::Picatch(format!(
-                "get_resized_dir_path: Failed to strip original_photos_dir ({}) from source path: {}",
+                "get_resized_dir_path: Failed to strip original_photos_dir ({}) from source_file_dir ({}), path: {}",
                 original_photos_dir.to_string_lossy(),
+                source_file_dir.to_string_lossy(),
                 path_str
             ))
         })?;
