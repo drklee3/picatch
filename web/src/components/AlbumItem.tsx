@@ -39,7 +39,6 @@ function AlbumItem({ pathComponents, album, dispatch }: AlbumItemProps) {
             <LazyLoad
                 height="100%"
                 offset={100}
-                overflow={true}
                 placeholder={<div className="album-placeholder" />}
             >
                 <div className="album-thumbnail-background" />
