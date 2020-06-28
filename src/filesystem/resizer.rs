@@ -1,10 +1,11 @@
 use crate::{
     error::{Error, Result},
-    filesystem::{hash::get_image_hash, utils},
-    model::{config::AppConfig, ResizeJob, ResizeOptions},
+    filesystem::utils,
+    model::{ResizeJob, ResizeOptions},
 };
-use image::{imageops::FilterType, DynamicImage, GenericImageView};
+use image::{imageops::FilterType, DynamicImage, GenericImageView, ImageFormat};
 use std::collections::HashMap;
+use std::fs::rename;
 use std::path::PathBuf;
 use threadpool::ThreadPool;
 
@@ -21,7 +22,6 @@ pub fn resize(img: &DynamicImage, opts: &ResizeOptions) -> Result<image::Dynamic
 
     let filter_type = opts.filter_type.unwrap_or(FilterType::Lanczos3);
 
-    // this is really slow :(
     let resized_img = match opts.mode {
         1 => img.resize(new_w, new_h, filter_type),
         2 => img.resize_exact(new_w, new_h, filter_type),
@@ -37,44 +37,37 @@ pub fn resize(img: &DynamicImage, opts: &ResizeOptions) -> Result<image::Dynamic
     Ok(resized_img)
 }
 
-pub fn _resize_images(
-    config: &AppConfig,
-    paths: Vec<std::path::PathBuf>,
-    opts_list: Vec<ResizeOptions>,
-) -> Result<()> {
-    // Paths should be relative to original_photos_dir and *not* include dir
-    for path in &paths {
-        debug!("Opening image {}", path.to_string_lossy());
-        let img = image::open(path)?;
-        debug!("Opened image {}", path.to_string_lossy());
+fn _execute_resize(job: ResizeJob, img: DynamicImage) -> Result<()> {
+    // Make sure destination dir exists
+    let dir = job.destination.parent().ok_or(Error::Picatch(format!(
+        "Failed to get resized file parent: {}",
+        &job.source.to_string_lossy()
+    )))?;
 
-        let img_hash = {
-            let mut hash = get_image_hash(img.to_bytes());
-            hash.truncate(32);
+    utils::dir_exists_or_create(&dir)?;
 
-            hash
-        };
+    let resized_img = resize(&img, &job.options)?;
 
-        debug!("Image hash: {}", &img_hash);
+    // Copy dest and add ".tmp" to end
+    let mut dest_str = job.destination.as_os_str().to_os_string();
+    dest_str.push(".tmp");
 
-        for opts in &opts_list {
-            let resized_img = resize(&img, &opts)?;
+    // Save to .tmp file first in case of failures or exits
+    // Use .save_with_format() since .save() uses extension to determine format
+    resized_img.save_with_format(&dest_str, ImageFormat::Jpeg)?;
 
-            let dest_path = utils::get_destination_path(config, path, &opts)?;
-
-            utils::dir_exists_or_create(
-                dest_path
-                    .parent()
-                    .ok_or(Error::Picatch("Failed to get resized file parent".into()))?,
-            )?;
-
-            debug!("Saving file to {}", dest_path.to_string_lossy());
-
-            resized_img.save(dest_path)?;
-        }
-    }
+    // Rename file to correct destination after write to disk
+    // Files not renamed will be cleaned up on startup scan
+    rename(dest_str, job.destination)?;
 
     Ok(())
+}
+
+/// Wraper around resize fn to catch error messages
+fn execute_resize(job: ResizeJob, img: DynamicImage) {
+    if let Err(e) = _execute_resize(job, img) {
+        error!("Failed to resize image: {}", e);
+    }
 }
 
 pub fn resize_images(pool: &ThreadPool, jobs_map: HashMap<PathBuf, Vec<ResizeJob>>) -> Result<()> {
@@ -89,22 +82,7 @@ pub fn resize_images(pool: &ThreadPool, jobs_map: HashMap<PathBuf, Vec<ResizeJob
         for job in jobs {
             let img = img.clone();
 
-            pool.execute(move || {
-                // Make sure destination dir exists
-                let dir = job
-                    .destination
-                    .parent()
-                    .ok_or(Error::Picatch(format!(
-                        "Failed to get resized file parent: {}",
-                        &job.source.to_string_lossy()
-                    )))
-                    .unwrap();
-
-                utils::dir_exists_or_create(&dir).unwrap();
-
-                let resized_img = resize(&img, &job.options).unwrap();
-                resized_img.save(&job.destination).unwrap();
-            });
+            pool.execute(move || execute_resize(job, img));
         }
     }
 
