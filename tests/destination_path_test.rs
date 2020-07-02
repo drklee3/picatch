@@ -1,5 +1,5 @@
 use picatch_lib::{
-    filesystem::utils::get_destination_path,
+    filesystem::path::get_destination_path,
     model::{config::AppConfig, ImageSize, ResizeOptions},
     utils::logging,
 };

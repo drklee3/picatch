@@ -1,8 +1,9 @@
 use crate::{
     error::Result,
     filesystem::{
+        files,
+        path::{get_resized_dir_path, get_resized_paths},
         resizer::resize_images,
-        utils,
         watcher::{get_watcher_event_action, FileAction},
     },
     model::{config::AppConfig, ImageSize, ResizeOptions},
@@ -23,10 +24,10 @@ pub fn startup_resize(
     opts_list: &Vec<ResizeOptions>,
 ) -> Result<()> {
     // These two do NOT include "./" prefix if original/resized_photos_dir doesn't start with "./"
-    let source_files = utils::get_all_files(Path::new(&config.original_photos_dir))?;
-    let resized_files = utils::get_all_files(Path::new(&config.resized_photos_dir))?;
+    let source_files = files::get_all_files(Path::new(&config.original_photos_dir))?;
+    let resized_files = files::get_all_files(Path::new(&config.resized_photos_dir))?;
 
-    let jobs = utils::get_files_not_resized(&config, &source_files, &resized_files, opts_list)?;
+    let jobs = files::get_files_not_resized(&config, &source_files, &resized_files, opts_list)?;
 
     if jobs.resize_jobs.len() > 0 {
         info!(
@@ -155,12 +156,12 @@ fn handle_fs_event(
             // If it's a new dir, scan entire folder
             // TODO: Only scan modified dir, however inconsistent relative paths
             let jobs = if path.is_dir() {
-                let source_files = utils::get_all_files(Path::new(&config.original_photos_dir))?;
-                let resized_files = utils::get_all_files(Path::new(&config.resized_photos_dir))?;
+                let source_files = files::get_all_files(Path::new(&config.original_photos_dir))?;
+                let resized_files = files::get_all_files(Path::new(&config.resized_photos_dir))?;
 
-                utils::get_files_not_resized(config, &source_files, &resized_files, opts_list)?
+                files::get_files_not_resized(config, &source_files, &resized_files, opts_list)?
             } else {
-                utils::get_files_not_resized(config, &vec![path], &vec![], opts_list)?
+                files::get_files_not_resized(config, &vec![path], &vec![], opts_list)?
             };
 
             info!(
@@ -173,8 +174,8 @@ fn handle_fs_event(
         FileAction::Rename(path, dest) => {
             // Move directory, only check destination if is dir since source doesn't exist anymore duh
             if dest.is_dir() {
-                let resized_dir_path = utils::get_resized_dir_path(config, &path)?;
-                let resized_dir_dest = utils::get_resized_dir_path(config, &dest)?;
+                let resized_dir_path = get_resized_dir_path(config, &path)?;
+                let resized_dir_dest = get_resized_dir_path(config, &dest)?;
 
                 if let Err(e) = rename(&resized_dir_path, &resized_dir_dest) {
                     warn!(
@@ -187,8 +188,8 @@ fn handle_fs_event(
                 return Ok(());
             }
 
-            let source_paths = utils::get_resized_paths(config, &path, opts_list)?;
-            let dest_paths = utils::get_resized_paths(config, &dest, opts_list)?;
+            let source_paths = get_resized_paths(config, &path, opts_list)?;
+            let dest_paths = get_resized_paths(config, &dest, opts_list)?;
 
             info!(
                 "Rename detected, renaming {} resized images",
@@ -199,7 +200,7 @@ fn handle_fs_event(
         }
         // Delete all resized files
         FileAction::Delete(path) => {
-            let paths = utils::get_resized_paths(config, &path, opts_list)?;
+            let paths = get_resized_paths(config, &path, opts_list)?;
             info!("Delete detected, deleting {} resized images", paths.len());
 
             remove_files(paths.into_iter());

@@ -1,6 +1,6 @@
 use num_cpus;
 use picatch_lib::{
-    filesystem::{background, utils},
+    filesystem::{background, files, utils},
     model::{
         config::{AppConfig, PubConfig},
         ImageSize, ResizeOptions,
@@ -51,7 +51,7 @@ fn builds_resized_file_path() {
 
     pool.join();
 
-    let resized_files = utils::get_all_files(Path::new(&config.resized_photos_dir)).unwrap();
+    let resized_files = files::get_all_files(Path::new(&config.resized_photos_dir)).unwrap();
 
     assert_eq!(9, resized_files.len());
 }
