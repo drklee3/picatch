@@ -956,10 +956,10 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.10.2", "@babel/runtime@^7.10.3", "@babel/runtime@^7.3.4", "@babel/runtime@^7.4.5", "@babel/runtime@^7.5.5", "@babel/runtime@^7.7.2", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
-  version "7.10.3"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.10.3.tgz#670d002655a7c366540c67f6fd3342cd09500364"
-  integrity sha512-RzGO0RLSdokm9Ipe/YD+7ww8X2Ro79qiXZF3HU9ljrM+qnJmH1Vqth+hbiQZy761LnMJTMitHDuKVYTk3k4dLw==
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.10.2", "@babel/runtime@^7.10.3", "@babel/runtime@^7.10.4", "@babel/runtime@^7.3.4", "@babel/runtime@^7.4.5", "@babel/runtime@^7.5.5", "@babel/runtime@^7.7.2", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
+  version "7.10.4"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.10.4.tgz#a6724f1a6b8d2f6ea5236dbfe58c7d7ea9c5eb99"
+  integrity sha512-UpTN5yUJr9b4EX2CnGNWIvER7Ab83ibv0pcvvHc4UOdrBI5jb8bj+32cCwPX6xu0mt2daFNjYhoi+X7beH0RSw==
   dependencies:
     regenerator-runtime "^0.13.4"
 
@@ -1344,15 +1344,15 @@
     "@svgr/plugin-svgo" "^4.3.1"
     loader-utils "^1.2.3"
 
-"@tanem/react-nprogress@^3.0.32":
-  version "3.0.32"
-  resolved "https://registry.yarnpkg.com/@tanem/react-nprogress/-/react-nprogress-3.0.32.tgz#1a7f99a121a989bb1ec6ec47b3aa3464c0900733"
-  integrity sha512-iogxmVLku/sEEYXRwtftp0jJSlBk3Pxr+eEACv0vU3kxgkS1qugp1eUTol7aJ/T5g6716BsTQcXyKpVR1LQO8w==
+"@tanem/react-nprogress@^3.0.33":
+  version "3.0.33"
+  resolved "https://registry.yarnpkg.com/@tanem/react-nprogress/-/react-nprogress-3.0.33.tgz#1f50b2685a4cbf3112250f71ab8cf57941b1e82d"
+  integrity sha512-uRCVtSMEMT2EDTba7GxBqYI3WN/mky45Dil6ObdtGemL4iatk/8IhSNRH8dbv3G216y8P/yPtw6fXVJ8mBCSKA==
   dependencies:
-    "@babel/runtime" "^7.10.3"
+    "@babel/runtime" "^7.10.4"
     hoist-non-react-statics "^3.3.2"
     prop-types "^15.7.2"
-    react-use "^15.3.0"
+    react-use "^15.3.2"
 
 "@testing-library/dom@^7.17.1":
   version "7.17.1"
@@ -9341,10 +9341,10 @@ react-universal-interface@^0.6.2:
   resolved "https://registry.yarnpkg.com/react-universal-interface/-/react-universal-interface-0.6.2.tgz#5e8d438a01729a4dbbcbeeceb0b86be146fe2b3b"
   integrity sha512-dg8yXdcQmvgR13RIlZbTRQOoUrDciFVoSBZILwjE2LFISxZZ8loVJKAkuzswl5js8BHda79bIb2b84ehU8IjXw==
 
-react-use@^15.3.0:
-  version "15.3.0"
-  resolved "https://registry.yarnpkg.com/react-use/-/react-use-15.3.0.tgz#42946aa6e7bf571104173439cc7b7e26a4ca4c51"
-  integrity sha512-4fFSn2eVbmRPlxHFeBy8uiCyrwMzavMs4hvzeDUFszijda9ZM6S0ElleqKHS+SmwpMFEFIk7dIzzJQZzJYcAXw==
+react-use@^15.3.2:
+  version "15.3.2"
+  resolved "https://registry.yarnpkg.com/react-use/-/react-use-15.3.2.tgz#73b2a0e071f47e7e907eb0024e4e7681ac2aab33"
+  integrity sha512-DAbc+pVedZC4P5rLBKdIvTTB03+4T/pR6jZ2pKQPgqfq4UC1Oymmbehon5z8XXSUgZs0tgIvbBzVEdiWMS9k+g==
   dependencies:
     "@types/js-cookie" "2.2.6"
     "@xobotyi/scrollbar-width" "1.9.5"
