@@ -1,5 +1,5 @@
 use crate::error::Result;
-use config;
+
 use serde::{Deserialize, Serialize};
 use std::cmp::Eq;
 use std::default::Default;

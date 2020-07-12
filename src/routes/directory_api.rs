@@ -5,7 +5,7 @@ use std::ffi::OsString;
 use std::fs::{read_to_string, File};
 use std::io::BufReader;
 use std::path::Path;
-use toml;
+
 
 use crate::{
     error::Result,
@@ -90,7 +90,7 @@ pub fn get_dir_listing(path: String, config: &AppConfig) -> Result<DirectoryList
 
         // Ignore dotfiles
         if let Some(name) = entry.file_name().to_str() {
-            if name.starts_with(".") {
+            if name.starts_with('.') {
                 continue;
             }
         }

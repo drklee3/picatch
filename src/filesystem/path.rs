@@ -13,7 +13,7 @@ fn get_current_dir() -> Result<PathBuf> {
     // path is propperly stripped
     let mut dir_str = dir.into_os_string();
 
-    if !dir_str.to_string_lossy().ends_with("/") {
+    if !dir_str.to_string_lossy().ends_with('/') {
         dir_str.push("/");
     }
 

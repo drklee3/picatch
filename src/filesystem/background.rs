@@ -9,7 +9,7 @@ use crate::{
     model::{config::AppConfig, ImageSize, ResizeOptions},
 };
 use notify::{watcher, DebouncedEvent, RecursiveMode, Watcher};
-use num_cpus;
+
 use same_file::is_same_file;
 use std::fs::{remove_file, rename};
 use std::path::{Path, PathBuf};
@@ -29,7 +29,7 @@ pub fn startup_resize(
 
     let jobs = files::get_files_not_resized(&config, &source_files, &resized_files, opts_list)?;
 
-    if jobs.resize_jobs.len() > 0 {
+    if !jobs.resize_jobs.is_empty() {
         info!(
             "{} source images to resize (total {} resized files)",
             jobs.resize_jobs.len(),
