@@ -63,7 +63,7 @@ fn get_file_dir<P: AsRef<Path>>(path: P) -> Result<PathBuf> {
     Ok(dir.into())
 }
 
-// Converts path in original_photos_dir to a path in resized_photos_dir
+/// Converts path in original_photos_dir to a path in resized_photos_dir
 pub fn get_resized_dir_path(config: &AppConfig, path: &Path) -> Result<PathBuf> {
     let path_str = path.to_string_lossy();
 
