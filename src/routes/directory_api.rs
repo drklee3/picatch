@@ -6,7 +6,6 @@ use std::fs::{read_to_string, File};
 use std::io::BufReader;
 use std::path::Path;
 
-
 use crate::{
     error::Result,
     model::{

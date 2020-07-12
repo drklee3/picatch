@@ -1,6 +1,5 @@
 use crate::error::Result;
 
-
 use fern::colors::{Color, ColoredLevelConfig};
 use log::LevelFilter;
 use std::env;
