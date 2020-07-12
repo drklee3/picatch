@@ -28,11 +28,10 @@ fn get_relative_dir<P: AsRef<Path>>(path: P) -> Result<PathBuf> {
     // We only want the ./photos/DSC_3328.jpg part. We don't need to
     // canonicalize() path beforehand since doesn't matter if there's an extra
     // /./ in the middle the /mnt/c/.../picatch/ part will be stripped
-    let path = match path.as_ref().strip_prefix(cur_dir) {
-        Ok(p) => p,
+    let path = path.as_ref().strip_prefix(cur_dir).unwrap_or({
         // If stripping cur_dir doesn't work, there's still the "./"
-        Err(_) => path.as_ref().strip_prefix(".").unwrap_or(path.as_ref()),
-    };
+        path.as_ref().strip_prefix(".").unwrap_or(path.as_ref())
+    });
 
     Ok(path.to_path_buf())
 }
