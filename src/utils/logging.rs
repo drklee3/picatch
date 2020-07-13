@@ -1,6 +1,5 @@
 use crate::error::Result;
-use chrono;
-use fern;
+
 use fern::colors::{Color, ColoredLevelConfig};
 use log::LevelFilter;
 use std::env;
@@ -13,7 +12,7 @@ pub fn setup_logger() -> Result<()> {
 
     thread::spawn(move || {
         while let Ok(msg) = rx.recv() {
-            handle_log_message(msg);
+            print!("{}", msg);
         }
     });
 
@@ -43,8 +42,4 @@ pub fn setup_logger() -> Result<()> {
     info!("Log filtering: {}", log_level);
 
     Ok(())
-}
-
-fn handle_log_message(msg: String) {
-    print!("{}", msg);
 }

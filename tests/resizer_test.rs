@@ -1,4 +1,3 @@
-use num_cpus;
 use picatch_lib::{
     filesystem::{background, files, utils},
     model::{

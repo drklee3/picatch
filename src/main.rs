@@ -2,9 +2,9 @@
 extern crate log;
 
 use actix_cors::Cors;
-use actix_files;
+
 use actix_web::{middleware, web, App, HttpResponse, HttpServer};
-use dotenv;
+
 use std::process;
 
 use picatch_lib::{
@@ -69,7 +69,7 @@ async fn run() -> Result<()> {
             .service(
                 web::resource("/{path:.*}")
                     .route(web::get().to(routes::static_files::path))
-                    .route(web::head().to(|| HttpResponse::Ok())),
+                    .route(web::head().to(HttpResponse::Ok)),
             )
     })
     .bind(format!("{}:{}", &config.interface, &config.port))?
