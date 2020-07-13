@@ -1,12 +1,13 @@
 name: CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
     frontend:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
+
             - name: Install Node.js dependencies
               working-directory: ./web
               run: yarn
@@ -22,6 +23,7 @@ jobs:
             - name: Set outputs
               id: vars
               run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
             - name: Upload frontend artifacts
               uses: actions/upload-artifact@v1
               with:
@@ -41,9 +43,11 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
+
             - name: Set outputs
               id: vars
               run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
             - name: Download frontend artifact
               uses: actions/download-artifact@v1
               with:
