@@ -6,13 +6,13 @@ updates:
   - package-ecosystem: "npm"
     directory: "/web"
     schedule:
-      interval: "daily"
+      interval: "monthly"
     labels:
       - "JS dependencies"
 
   - package-ecosystem: "cargo"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "monthly"
     labels:
       - "Rust dependencies"
